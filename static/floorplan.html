@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Floor Plan Generator — StructAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --stone: #1C1A17; --copper: #B5651D; --sand: #F5F0E8; --dark: #0D0F14;
+            --border: rgba(181, 101, 29, 0.2); --card-bg: rgba(255, 255, 255, 0.03);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Barlow', sans-serif; background: var(--dark); color: var(--sand);
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .nav {
+            padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; background: rgba(13, 15, 20, 0.8);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+        .logo-icon { width: 32px; height: 32px; border: 1.5px solid var(--copper); border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(181, 101, 29, 0.1); }
+        .brand-name { font-family: 'DM Serif Display', serif; font-size: 1.2rem; }
+        .nav-btn { background: var(--copper); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+
+        .main-layout { flex: 1; display: grid; grid-template-columns: 320px 1fr; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.02); border-right: 1px solid var(--border);
+            padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem;
+        }
+        .section-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--copper); margin-bottom: 1rem; }
+        .input-group { display: flex; flex-direction: column; gap: 12px; }
+        .input-row { display: flex; flex-direction: column; gap: 5px; }
+        .label { font-size: 0.8rem; color: rgba(245, 240, 232, 0.6); }
+        .field { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(245, 240, 232, 0.1); border-radius: 6px; padding: 10px; color: white; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        .field:focus { border-color: var(--copper); }
+        .btn-gen { background: var(--copper); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform 0.1s; }
+        .btn-gen:active { transform: scale(0.98); }
+        .btn-reset { background: transparent; border: 1px solid rgba(245, 240, 232, 0.2); color: var(--sand); padding: 10px; border-radius: 6px; cursor: pointer; }
+
+        /* Workspace */
+        .viewport { position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .canvas-container { flex: 1; position: relative; background: #111418; display: flex; align-items: center; justify-content: center; cursor: grab; }
+        .canvas-container:active { cursor: grabbing; }
+        canvas { box-shadow: 0 20px 50px rgba(0,0,0,0.5); background: #1a1f26; }
+        
+        .controls-overlay { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; }
+        .control-btn { background: rgba(13, 15, 20, 0.8); border: 1px solid var(--border); color: white; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        
+        .info-panel { position: absolute; top: 20px; right: 20px; width: 240px; background: rgba(13, 15, 20, 0.85); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; backdrop-filter: blur(10px); }
+        .info-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 10px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; }
+        .stat-label { font-size: 0.65rem; text-transform: uppercase; color: rgba(245,240,232,0.4); }
+        .stat-val { font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--copper); }
+
+        .legend { display: flex; gap: 15px; padding: 10px 20px; background: rgba(0,0,0,0.2); font-size: 0.75rem; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 2px; }
+        .col-dot-legend { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #10B981; position: relative; }
+        .col-dot-legend::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 4px; height: 4px; background: #10B981; border-radius: 50%; }
+
+        /* Toast */
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--copper); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast">Plan Generated Successfully!</div>
+
+    <nav class="nav">
+        <a href="/" class="nav-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                    <path d="M3 21h18M3 10l9-7 9 7v11H3V10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="brand-name">StructAI Designer</div>
+        </a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button id="btn-toggle-columns-header" style="background: transparent; border: 1px solid var(--border); color: var(--sand); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;">2D Column Grid</button>
+            <a href="/soil" style="color: rgba(245,240,232,0.6); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Soil Analysis</a>
+            <a href="/column-grid" style="color: rgba(245,240,232,0.6); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">3D Column Grid</a>
+            <a href="/" class="nav-btn">Main Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="main-layout">
+        <div class="sidebar">
+            <div>
+                <div class="section-title">Plot Dimensions (Feet)</div>
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="label">Width (ft)</span>
+                        <input type="number" id="plot-width" class="field" value="25" min="10" step="0.5">
+                    </div>
+                    <div class="input-row">
+                        <span class="label">Length (ft)</span>
+                        <input type="number" id="plot-length" class="field" value="40" min="10" step="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">Configuration</div>
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="label">Bedrooms</span>
+                        <input type="number" id="num-bedrooms" class="field" value="2" min="1" max="5">
+                    </div>
+                    <div class="input-row">
+                        <span class="label">Bathrooms</span>
+                        <input type="number" id="num-bathrooms" class="field" value="2" min="1" max="4">
+                    </div>
+                    <div class="input-row">
+                        <span class="label">Kitchen Type</span>
+                        <select id="kitchen-type" class="field">
+                            <option value="open">Open Concept</option>
+                            <option value="closed">Closed Kitchen</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">Preferences</div>
+                <div class="input-group">
+                    <div class="input-row" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                        <span class="label">Vastu Compliant</span>
+                        <input type="checkbox" id="vastu-pref" style="accent-color: var(--copper);">
+                    </div>
+                    <div class="input-row" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                        <span class="label">Parking Space</span>
+                        <input type="checkbox" id="parking-req" checked style="accent-color: var(--copper);">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">Site Context</div>
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="label">Road Position</span>
+                        <select id="road-pos" class="field">
+                            <option value="none">No Road</option>
+                            <option value="north">North Side</option>
+                            <option value="south">South Side</option>
+                            <option value="east">East Side</option>
+                            <option value="west">West Side</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span class="label">Road Distance (m)</span>
+                            <span id="dist-val" style="font-size: 0.8rem; color: var(--copper); font-family: 'DM Mono';">5m</span>
+                        </div>
+                        <input type="range" id="road-dist" class="field" min="2" max="30" value="5" step="0.5" style="padding: 0;">
+                    </div>
+                    <div class="input-row" style="flex-direction: row; justify-content: space-between; align-items: center; background: rgba(181, 101, 29, 0.1); padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span class="label" style="color: var(--copper); font-weight: 700;">Enable Manual Edit</span>
+                        <input type="checkbox" id="edit-mode" style="accent-color: var(--copper); width: 18px; height: 18px;">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">Structural Column Grid</div>
+                <div class="input-group">
+                    <div class="input-row" style="flex-direction: row; justify-content: space-between; align-items: center; background: rgba(181, 101, 29, 0.15); padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                        <span class="label" style="color: var(--copper); font-weight: 700;">Show Column Grid</span>
+                        <input type="checkbox" id="show-columns" checked style="accent-color: var(--copper); width: 18px; height: 18px;">
+                    </div>
+                    <div class="input-row">
+                        <span class="label">Column Type</span>
+                        <select id="col-type" class="field">
+                            <option value="square">Square</option>
+                            <option value="rectangle">Rectangular</option>
+                            <option value="circular">Circular</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <span class="label">Column Width (mm)</span>
+                        <input type="number" id="col-width" class="field" value="300" step="50" min="200" max="600">
+                    </div>
+                    <div id="rect-depth-row" class="input-row" style="display: none;">
+                        <span class="label">Column Depth (mm)</span>
+                        <input type="number" id="col-depth" class="field" value="450" step="50" min="200" max="900">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+                <button id="btn-generate" class="btn-gen">Generate 2D Plan</button>
+                <button id="btn-reset" class="btn-reset">Reset Defaults</button>
+                <button id="btn-download" class="btn-reset" style="border-color: var(--copper); color: var(--copper);">Download PNG</button>
+            </div>
+        </div>
+
+        <div class="viewport">
+            <div class="legend">
+                <div class="legend-item"><div class="dot" style="background: #FDFCF0;"></div> Living</div>
+                <div class="legend-item"><div class="dot" style="background: #F0FDF4;"></div> Bedroom</div>
+                <div class="legend-item"><div class="dot" style="background: #F0FDFA;"></div> Kitchen</div>
+                <div class="legend-item"><div class="dot" style="background: #FEF2F2;"></div> Bath</div>
+                <div class="legend-item"><div class="dot" style="background: #FFF7ED;"></div> Pooja</div>
+                <div class="legend-item"><div class="col-dot-legend"></div> Column</div>
+            </div>
+
+            <div class="canvas-container" id="canvas-container">
+                <canvas id="floorCanvas"></canvas>
+                
+                <div class="info-panel" id="info-panel" style="display: none;">
+                    <div class="info-title" id="room-type">Living Hall</div>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Dimensions</div>
+                            <div class="stat-val" id="room-dim">5.4 × 4.2m</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Area</div>
+                            <div class="stat-val" id="room-area">22.6 m²</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-overlay">
+                    <button class="control-btn" onclick="zoom(1.1)">+</button>
+                    <button class="control-btn" onclick="zoom(0.9)">-</button>
+                    <button class="control-btn" onclick="resetZoom()">⌂</button>
+                </div>
+            </div>
+
+            <div class="legend" style="border-top: 1px solid var(--border); background: rgba(0,0,0,0.4);">
+                <div class="legend-item" style="color: var(--sand);">Total Area: <span id="total-area" style="color: var(--copper); font-family: 'DM Mono'; font-weight: 600;">180 m²</span></div>
+                <div class="legend-item" style="color: var(--sand); margin-left: 20px;">Built-up: <span id="built-area" style="color: var(--copper); font-family: 'DM Mono'; font-weight: 600;">145 m²</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="/static/floorplan.js"></script>
+</body>
+</html>

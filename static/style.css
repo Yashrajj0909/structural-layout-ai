@@ -1,0 +1,105 @@
+
+:root {
+    --bg-dark: #0A0C10;
+    --bg-med: #141820;
+    --text-light: #EAEAEA;
+    --text-med: #8B8880;
+    --accent-orange: #B5651D;
+}
+
+body.soil-analysis-page {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: sans-serif;
+}
+
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.analysis-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+
+.input-section, .card {
+    background-color: var(--bg-med);
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+input, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--text-med);
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    border-radius: 4px;
+}
+
+.button-group {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: var(--accent-orange);
+    color: var(--text-light);
+    font-weight: bold;
+}
+
+.nav-button {
+    background-color: var(--accent-orange);
+    color: var(--text-light);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.results-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+}
+
+.toast.success {
+    background-color: #4A7C59;
+}
+
+.toast.error {
+    background-color: #8B3A2A;
+}

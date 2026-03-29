@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil & FSI Analysis - StructAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="soil-analysis-page">
+    <div class="main-container">
+        <header>
+            <h1>Soil & FSI Analysis</h1>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="/floorplan" class="nav-button" style="background: transparent; border: 1px solid var(--accent-orange);">2D Floor Plan</a>
+                <a href="/" class="nav-button">Main Dashboard</a>
+            </div>
+            <div class="lang-toggle">
+                <button id="lang-en" class="active">EN</button>
+                <button id="lang-mr">MR</button>
+            </div>
+        </header>
+
+        <div class="analysis-container">
+            <div class="input-section">
+                <h2>Location & Plot Details</h2>
+                <div class="form-grid">
+                    <input type="text" id="city" placeholder="City / Area Name">
+                    <input type="text" id="pincode" placeholder="Pincode">
+                    <input type="text" id="lat" placeholder="Latitude (Optional)">
+                    <input type="text" id="lon" placeholder="Longitude (Optional)">
+                    <input type="number" id="plot-area" placeholder="Plot Area (sq. m)">
+                    <select id="locality-type">
+                        <option value="urban">Urban</option>
+                        <option value="semi-urban">Semi-urban</option>
+                        <option value="rural">Rural</option>
+                    </select>
+                </div>
+                <div class="button-group">
+            <button id="detect-location">Detect Location</button>
+            <button id="analyze-btn">Analyze</button>
+            <button id="export-pdf-btn">Export PDF</button>
+        </div>
+            </div>
+
+            <div class="results-section">
+                <div id="soil-analysis" class="card">
+                    <h3>Soil Analysis</h3>
+                    <canvas id="soil-chart"></canvas>
+                </div>
+                <div id="fsi-analysis" class="card">
+                    <h3>FSI Calculation</h3>
+                    <canvas id="fsi-chart"></canvas>
+                </div>
+                <div id="construction-suitability" class="card">
+                    <h3>Construction Suitability</h3>
+                </div>
+                <div id="ai-insights" class="card">
+                    <h3>AI Insights</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/soil.js"></script>
+</body>
+</html>

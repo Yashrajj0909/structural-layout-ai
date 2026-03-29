@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StructAI Designer — Smart House Optimization System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --stone:#1C1A17;--steel:#3D5A6C;--cement:#8B8880;
+  --copper:#B5651D;--lime:#4A7C59;--sand:#F5F0E8;
+  --rust:#8B3A2A;--sky:#5B8FA8;--panel:#FAFAF7;
+  --border:rgba(44,42,37,0.12);--gold:#D4A853;
+  --dark:#0D0F14;--accent:#FF6B35;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--sand);overflow-x:hidden;}
+
+/* ═══════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════ */
+#landing{
+  min-height:100vh;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+#bgCanvas{position:absolute;inset:0;z-index:0;}
+
+.nav{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.4rem 3rem;
+  border-bottom:1px solid rgba(181,101,29,0.2);
+  background:rgba(13,15,20,0.6);
+  backdrop-filter:blur(12px);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:14px;
+}
+.nav-icon{
+  width:42px;height:42px;border:1.5px solid var(--copper);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(181,101,29,0.1);
+}
+.nav-text .name{font-family:'DM Serif Display',serif;font-size:20px;color:#F5F0E8;letter-spacing:.3px;}
+.nav-text .sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--copper);letter-spacing:2.5px;text-transform:uppercase;margin-top:2px;}
+.nav-links{display:flex;align-items:center;gap:2rem;font-size:12px;font-weight:500;letter-spacing:.5px;}
+.nav-links a{color:rgba(245,240,232,0.55);text-decoration:none;text-transform:uppercase;letter-spacing:1.5px;font-size:10px;transition:color .2s;}
+.nav-links a:hover{color:var(--copper);}
+.nav-cta{
+  background:var(--copper);color:#F5F0E8;border:none;border-radius:6px;
+  padding:8px 20px;font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;cursor:pointer;font-family:'Barlow',sans-serif;
+  transition:all .2s;
+}
+.nav-cta:hover{background:#C8751D;transform:translateY(-1px);}
+
+.hero{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:4rem 2rem;position:relative;z-index:5;
+  min-height:calc(100vh - 70px);
+}
+.hero-eyebrow{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--copper);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:12px;
+  opacity:0;animation:fadeSlideUp .8s ease .2s forwards;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{
+  content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(181,101,29,.5));
+  max-width:60px;
+}
+.hero-eyebrow::after{background:linear-gradient(270deg,transparent,rgba(181,101,29,.5));}
+.hero-h1{
+  font-family:'DM Serif Display',serif;font-size:clamp(3.5rem,8vw,7.5rem);
+  line-height:.95;letter-spacing:-2px;color:#F5F0E8;margin-bottom:1rem;
+  opacity:0;animation:fadeSlideUp .9s ease .4s forwards;
+}
+.hero-h1 em{font-style:italic;color:var(--copper);}
+.hero-sub{
+  font-size:clamp(1rem,2vw,1.2rem);color:rgba(245,240,232,.55);
+  max-width:560px;line-height:1.7;margin-bottom:2.5rem;font-weight:300;
+  opacity:0;animation:fadeSlideUp .9s ease .6s forwards;
+}
+.hero-actions{
+  display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:fadeSlideUp .9s ease .8s forwards;
+}
+.btn-primary{
+  background:var(--copper);color:#F5F0E8;border:none;border-radius:8px;
+  padding:14px 36px;font-size:14px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;font-family:'Barlow',sans-serif;text-transform:uppercase;
+  transition:all .25s;position:relative;overflow:hidden;
+  border-bottom:3px solid rgba(0,0,0,.2);
+}
+.btn-primary::after{
+  content:'';position:absolute;inset:0;background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,.1) 50%,transparent 70%);
+  transform:translateX(-100%);transition:transform .5s;
+}
+.btn-primary:hover{background:#C8751D;transform:translateY(-2px);box-shadow:0 12px 40px rgba(181,101,29,.35);}
+.btn-primary:hover::after{transform:translateX(100%);}
+.btn-secondary{
+  background:transparent;color:#F5F0E8;border:1px solid rgba(245,240,232,.25);border-radius:8px;
+  padding:14px 36px;font-size:14px;font-weight:500;letter-spacing:.5px;
+  cursor:pointer;font-family:'Barlow',sans-serif;transition:all .25s;
+}
+.btn-secondary:hover{border-color:var(--copper);color:var(--copper);}
+
+.hero-stats{
+  display:flex;gap:3rem;margin-top:4rem;
+  opacity:0;animation:fadeSlideUp .9s ease 1s forwards;
+}
+.stat-item{text-align:center;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:2.2rem;color:#F5F0E8;}
+.stat-lbl{font-size:11px;color:rgba(245,240,232,.4);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+
+/* floating tags */
+.float-tag{
+  position:absolute;background:rgba(13,15,20,.8);border:1px solid rgba(181,101,29,.3);
+  border-radius:8px;padding:8px 14px;font-family:'DM Mono',monospace;font-size:10px;
+  color:rgba(245,240,232,.7);backdrop-filter:blur(10px);z-index:6;
+  opacity:0;animation:floatIn .8s ease forwards;
+}
+.ft1{top:28%;left:5%;animation-delay:1.2s;}
+.ft2{top:35%;right:5%;animation-delay:1.4s;}
+.ft3{bottom:20%;left:8%;animation-delay:1.6s;}
+.ft4{bottom:25%;right:7%;animation-delay:1.8s;}
+.float-tag span{color:var(--copper);font-weight:500;}
+
+/* scroll indicator */
+.scroll-hint{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;z-index:6;
+  opacity:0;animation:fadeSlideUp .8s ease 2s forwards;
+  cursor:pointer;
+}
+.scroll-hint span{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(245,240,232,.35);text-transform:uppercase;}
+.scroll-arrow{width:20px;height:20px;border-right:1.5px solid rgba(245,240,232,.35);border-bottom:1.5px solid rgba(245,240,232,.35);transform:rotate(45deg);animation:bounce 1.5s infinite;}
+
+/* features section */
+#features{
+  background:#F0EBE0;color:var(--stone);
+  padding:6rem 3rem;position:relative;
+}
+.features-grid{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+}
+.features-left .sec-eyebrow{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--copper);margin-bottom:1rem;
+}
+.features-left h2{
+  font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3.5rem);
+  line-height:1.1;color:var(--stone);margin-bottom:1.5rem;
+}
+.features-left h2 em{font-style:italic;color:var(--copper);}
+.features-left p{font-size:15px;line-height:1.8;color:rgba(44,42,37,.65);margin-bottom:2rem;}
+.feat-list{display:flex;flex-direction:column;gap:16px;}
+.feat-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:16px;background:white;border-radius:10px;
+  border:0.5px solid var(--border);transition:all .2s;
+}
+.feat-item:hover{transform:translateX(6px);box-shadow:0 4px 20px rgba(44,42,37,.1);}
+.feat-icon{
+  width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;
+}
+.feat-text .ft-title{font-size:13px;font-weight:600;color:var(--stone);margin-bottom:3px;}
+.feat-text .ft-desc{font-size:12px;color:var(--cement);line-height:1.5;}
+.features-right{
+  background:var(--stone);border-radius:16px;padding:2rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.mini-card{
+  background:rgba(245,240,232,.06);border:1px solid rgba(245,240,232,.1);
+  border-radius:10px;padding:16px;transition:all .2s;
+}
+.mini-card:hover{background:rgba(245,240,232,.1);transform:translateY(-2px);}
+.mc-icon{font-size:24px;margin-bottom:8px;}
+.mc-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(245,240,232,.5);margin-bottom:6px;}
+.mc-val{font-family:'DM Serif Display',serif;font-size:22px;color:#F5F0E8;}
+.mc-sub{font-size:11px;color:rgba(245,240,232,.35);margin-top:4px;}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD PAGE
+═══════════════════════════════════════════ */
+#dashboard{
+  background:var(--sand);color:var(--stone);
+}
+.topbar{
+  background:var(--stone);color:#F5F0E8;padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;border-bottom:3px solid var(--copper);
+  position:sticky;top:0;z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.logo-mark{
+  width:38px;height:38px;border:1.5px solid var(--copper);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;background:rgba(181,101,29,.1);
+}
+.brand-name{font-family:'DM Serif Display',serif;font-size:19px;color:#F5F0E8;}
+.brand-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--copper);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:20px;font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,240,232,.5);}
+.status-dot{width:6px;height:6px;background:var(--lime);border-radius:50%;display:inline-block;margin-right:5px;animation:pulse 2s infinite;}
+
+/* main grid */
+.main-grid{display:grid;grid-template-columns:260px 1fr;}
+.sidebar{
+  background:var(--panel);border-right:0.5px solid var(--border);
+  padding:1.25rem 1rem;display:flex;flex-direction:column;gap:1.4rem;
+  min-height:calc(100vh - 60px);overflow-y:auto;
+}
+.sec-title{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cement);margin-bottom:8px;padding-left:2px;
+}
+.input-group{display:flex;flex-direction:column;gap:10px;}
+.input-row{display:flex;flex-direction:column;gap:4px;}
+.input-label{font-size:11px;color:var(--cement);font-weight:500;letter-spacing:.3px;}
+.ifield{
+  background:white;border:0.5px solid var(--border);border-radius:6px;
+  padding:7px 10px;font-family:'Barlow',sans-serif;font-size:13px;
+  color:var(--stone);width:100%;outline:none;transition:border-color .2s;
+}
+.ifield:focus{border-color:var(--steel);}
+select.ifield{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238B8880'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer;
+}
+.range-row{display:flex;align-items:center;gap:8px;}
+.range-row input[type=range]{flex:1;accent-color:var(--steel);}
+.range-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--steel);min-width:30px;text-align:right;}
+.gen-btn{
+  background:var(--stone);color:#F5F0E8;border:none;border-radius:8px;
+  padding:11px 16px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:.5px;cursor:pointer;width:100%;border-bottom:3px solid var(--copper);
+  transition:all .15s;margin-top:4px;
+}
+.gen-btn:hover{opacity:.88;transform:translateY(-1px);}
+.gen-btn:active{transform:translateY(0);}
+
+/* content */
+.content-area{padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
+
+/* workflow */
+.workflow-steps{display:flex;align-items:center;width:100%;}
+.wf-step{
+  flex:1;background:var(--sand);
+  border:0.5px solid var(--border);border-right:none;
+  padding:10px 6px;font-size:11px;color:var(--stone);font-weight:500;text-align:center;
+}
+.wf-step:first-child{border-radius:6px 0 0 6px;}
+.wf-step:last-child{border-right:0.5px solid var(--border);border-radius:0 6px 6px 0;}
+.wf-step.active{background:var(--stone);color:#F5F0E8;}
+.wf-step.done{background:#EEF4F7;color:var(--steel);}
+.wf-num{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;opacity:.6;margin-bottom:2px;}
+.arrow-sep{width:0;height:0;border-top:20px solid transparent;border-bottom:20px solid transparent;border-left:12px solid var(--sand);flex-shrink:0;z-index:2;}
+.arrow-sep.active{border-left-color:var(--stone);}
+.arrow-sep.done{border-left-color:#EEF4F7;}
+
+/* metrics */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.metric-card{
+  background:white;border:0.5px solid var(--border);border-radius:10px;
+  padding:14px 16px;position:relative;overflow:hidden;transition:box-shadow .2s;
+  animation:slideInCard .5s ease forwards;opacity:0;
+}
+.metric-card:nth-child(1){animation-delay:.1s;}
+.metric-card:nth-child(2){animation-delay:.2s;}
+.metric-card:nth-child(3){animation-delay:.3s;}
+.metric-card:nth-child(4){animation-delay:.4s;}
+@keyframes slideInCard{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.metric-card:hover{box-shadow:0 4px 20px rgba(44,42,37,.1);}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.mc-safety::before{background:var(--lime);}
+.mc-cols::before{background:var(--steel);}
+.mc-cost::before{background:var(--copper);}
+.mc-save::before{background:var(--rust);}
+.m-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--cement);margin-bottom:6px;}
+.m-value{font-family:'DM Serif Display',serif;font-size:26px;color:var(--stone);line-height:1;}
+.m-sub{font-size:11px;color:var(--cement);margin-top:4px;}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;margin-top:4px;}
+.bg{background:#E6F2EA;color:var(--lime);}
+.bb{background:#E8EFF3;color:var(--steel);}
+.ba{background:#F7EDDE;color:var(--copper);}
+.br{background:#F2E6E3;color:var(--rust);}
+
+/* panels */
+.panels-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.panel{background:white;border:0.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.panel:hover{box-shadow:0 2px 14px rgba(44,42,37,.07);}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:0.5px solid var(--border);background:var(--panel);
+}
+.panel-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--stone);}
+.panel-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--cement);background:var(--sand);padding:3px 8px;border-radius:4px;border:0.5px solid var(--border);}
+.panel-body{padding:16px;}
+
+/* floor plan */
+.floor-plan{
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;
+  gap:3px;background:var(--border);border:0.5px solid var(--border);border-radius:6px;overflow:hidden;
+}
+.room{
+  background:#F8F6F1;padding:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:64px;position:relative;
+}
+.room-living{background:#EEF4F7;grid-column:span 2;}
+.room-bed1{background:#F0EEF7;}
+.room-bed2{background:#F0EEF7;}
+.room-kitchen{background:#F7F0EE;}
+.room-bath{background:#EEF7F0;}
+.room-name{font-size:11px;font-weight:600;color:var(--stone);}
+.room-size{font-family:'DM Mono',monospace;font-size:10px;color:var(--cement);margin-top:2px;}
+.col-dot{width:8px;height:8px;background:var(--steel);border-radius:50%;border:1.5px solid var(--stone);position:absolute;}
+.ctlp{top:4px;left:4px;}.ctrp{top:4px;right:4px;}
+.cblp{bottom:4px;left:4px;}.cbrp{bottom:4px;right:4px;}
+.beam-h{position:absolute;top:50%;left:4px;right:4px;height:1.5px;background:rgba(61,90,108,.35);}
+.beam-v{position:absolute;left:50%;top:4px;bottom:4px;width:1.5px;background:rgba(61,90,108,.35);}
+
+/* structural table */
+.s-table{width:100%;border-collapse:collapse;font-size:12px;}
+.s-table thead th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--cement);text-align:left;padding:0 0 8px;border-bottom:0.5px solid var(--border);}
+.s-table tbody td{padding:8px 0;border-bottom:0.5px solid rgba(44,42,37,.06);color:var(--stone);}
+.s-table tbody td:last-child{text-align:right;}
+.pb-wrap{background:var(--sand);border-radius:3px;height:6px;overflow:hidden;margin-top:2px;}
+.pb-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+
+/* 3D viewer */
+.viewer-full{background:white;border:0.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.viewer-body-wrap{display:grid;grid-template-columns:1fr 195px;}
+#threeCanvas{display:block;width:100%;height:480px;cursor:grab;background:#1A1F2B;}
+#threeCanvas:active{cursor:grabbing;}
+.v-controls{
+  background:var(--panel);border-left:0.5px solid var(--border);
+  padding:14px 12px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;max-height:480px;
+}
+.v-ctrl-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cement);margin-bottom:4px;}
+.v-ctrl-sec{display:flex;flex-direction:column;gap:6px;}
+.v-toggle-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--stone);}
+.v-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.tog-btn{width:32px;height:18px;border-radius:9px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.tog-btn.on{background:var(--steel);}.tog-btn.off{background:#D3D1C7;}
+.tog-btn::after{content:'';position:absolute;top:2px;width:14px;height:14px;border-radius:50%;background:white;transition:left .2s;}
+.tog-btn.on::after{left:16px;}.tog-btn.off::after{left:2px;}
+.fl-btns{display:flex;flex-direction:column;gap:4px;}
+.fl-btn{
+  background:var(--sand);border:0.5px solid var(--border);border-radius:5px;
+  padding:6px 8px;font-family:'DM Mono',monospace;font-size:10px;color:var(--stone);cursor:pointer;text-align:left;transition:background .15s;
+}
+.fl-btn.active{background:var(--stone);color:#F5F0E8;border-color:var(--stone);}
+.fl-btn:hover:not(.active){background:#E8E5DC;}
+.r-row{display:flex;gap:4px;}
+.r-btn{
+  flex:1;background:var(--sand);border:0.5px solid var(--border);border-radius:5px;
+  padding:6px 4px;font-size:11px;color:var(--stone);cursor:pointer;text-align:center;
+  font-family:'DM Mono',monospace;transition:background .15s;
+}
+.r-btn:hover{background:#E8E5DC;}.r-btn.active-rb{background:var(--stone);color:#F5F0E8;}
+.mm-card{background:var(--sand);border-radius:6px;padding:8px 10px;border:0.5px solid var(--border);}
+.mm-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--cement);}
+.mm-val{font-family:'DM Mono',monospace;font-size:14px;color:var(--stone);font-weight:500;margin-top:2px;}
+.col-info{background:#1e2535;border:1px solid var(--copper);border-radius:6px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:10px;color:#F5F0E8;line-height:1.7;display:none;}
+.col-info.show{display:block;}
+.pulse-badge{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--copper);margin-right:5px;animation:pblink 1.2s infinite;}
+.v-footer{padding:8px 16px;border-top:0.5px solid var(--border);background:var(--panel);display:flex;align-items:center;gap:16px;font-family:'DM Mono',monospace;font-size:10px;color:var(--cement);}
+.v-leg-items{display:flex;flex-direction:column;gap:5px;}
+.v-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--stone);}
+.v-leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+/* comparison charts */
+.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.comp-block{background:var(--sand);border-radius:8px;padding:12px;border:0.5px solid var(--border);}
+.comp-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--cement);margin-bottom:8px;}
+.comp-val{font-family:'DM Serif Display',serif;font-size:20px;color:var(--stone);}
+.comp-diff{font-size:11px;margin-top:4px;}
+.diff-g{color:var(--lime);}.diff-b{color:var(--rust);}
+.leg-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;color:var(--cement);}
+.leg-item{display:flex;align-items:center;gap:5px;}
+.leg-sq{width:10px;height:10px;border-radius:2px;}
+
+/* ═══════════════════════════════════════════
+   INTERIOR DESIGN SECTION
+═══════════════════════════════════════════ */
+#interior{
+  background:var(--stone);color:#F5F0E8;padding:0;position:relative;
+}
+.int-header{
+  text-align:center;padding:5rem 2rem 3rem;position:relative;
+  border-bottom:1px solid rgba(245,240,232,.08);
+}
+.int-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--copper);margin-bottom:1rem;}
+.int-h2{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,5vw,4rem);line-height:1;color:#F5F0E8;margin-bottom:1rem;}
+.int-h2 em{font-style:italic;color:var(--copper);}
+.int-sub{font-size:14px;color:rgba(245,240,232,.45);max-width:500px;margin:0 auto;}
+.int-main{display:grid;grid-template-columns:320px 1fr;gap:0;min-height:700px;}
+.int-controls{
+  background:rgba(0,0,0,.3);border-right:1px solid rgba(245,240,232,.08);
+  padding:2rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem;overflow-y:auto;
+}
+.int-sec{display:flex;flex-direction:column;gap:10px;}
+.int-sec-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,240,232,.35);margin-bottom:4px;}
+.room-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.room-btn{
+  background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);border-radius:8px;
+  padding:10px 8px;font-size:11px;font-weight:500;color:rgba(245,240,232,.6);cursor:pointer;
+  text-align:center;transition:all .2s;font-family:'Barlow',sans-serif;
+}
+.room-btn:hover{background:rgba(245,240,232,.1);color:#F5F0E8;}
+.room-btn.active{background:var(--copper);color:#F5F0E8;border-color:var(--copper);}
+.style-strip{display:flex;flex-direction:column;gap:6px;}
+.style-opt{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(245,240,232,.04);border:1px solid rgba(245,240,232,.08);
+  border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s;
+}
+.style-opt:hover{background:rgba(245,240,232,.08);}
+.style-opt.active{border-color:var(--copper);background:rgba(181,101,29,.1);}
+.style-swatch{width:28px;height:28px;border-radius:6px;flex-shrink:0;}
+.style-info .style-name{font-size:12px;font-weight:600;color:#F5F0E8;}
+.style-info .style-desc{font-size:10px;color:rgba(245,240,232,.4);margin-top:1px;}
+.color-palettes{display:flex;flex-direction:column;gap:8px;}
+.palette-row{display:flex;align-items:center;gap:10px;}
+.palette-name{font-size:11px;color:rgba(245,240,232,.5);width:60px;flex-shrink:0;}
+.palette-colors{display:flex;gap:4px;}
+.swatch{width:22px;height:22px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:transform .15s;}
+.swatch:hover{transform:scale(1.2);}
+.swatch.active{border-color:#F5F0E8;}
+.furnishing-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.furn-item{
+  background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.08);
+  border-radius:8px;padding:10px;cursor:pointer;transition:all .2s;text-align:center;
+}
+.furn-item:hover{background:rgba(245,240,232,.1);}
+.furn-item.active{border-color:var(--copper);background:rgba(181,101,29,.1);}
+.furn-icon{font-size:20px;margin-bottom:4px;}
+.furn-name{font-size:10px;color:rgba(245,240,232,.6);}
+.apply-btn{
+  background:var(--copper);color:#F5F0E8;border:none;border-radius:8px;
+  padding:12px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:.5px;cursor:pointer;width:100%;margin-top:4px;
+  border-bottom:3px solid rgba(0,0,0,.2);transition:all .2s;
+}
+.apply-btn:hover{background:#C8751D;}
+
+/* interior 3d viewer */
+.int-viewer-wrap{position:relative;background:#111418;}
+#intCanvas{display:block;width:100%;height:100%;min-height:700px;cursor:grab;}
+#intCanvas:active{cursor:grabbing;}
+.int-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.7));
+  padding:2rem;display:flex;justify-content:space-between;align-items:flex-end;
+  pointer-events:none;
+}
+.int-room-label{font-family:'DM Serif Display',serif;font-size:1.8rem;color:#F5F0E8;opacity:.9;}
+.int-style-badge{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--copper);background:rgba(181,101,29,.15);border:1px solid rgba(181,101,29,.3);
+  border-radius:6px;padding:6px 12px;
+}
+.int-footer{
+  background:rgba(0,0,0,.4);border-top:1px solid rgba(245,240,232,.08);
+  padding:1rem 2rem;display:flex;align-items:center;gap:1.5rem;
+  font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,240,232,.4);
+}
+
+/* ═══════════════════════════════════════════
+   FINAL OUTPUT SECTION
+═══════════════════════════════════════════ */
+#output{
+  background:#0D0F14;color:#F5F0E8;padding:5rem 3rem;
+}
+.output-header{text-align:center;margin-bottom:4rem;}
+.output-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--copper);margin-bottom:1rem;}
+.output-h2{font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,5vw,4.5rem);line-height:1;color:#F5F0E8;margin-bottom:1rem;}
+.output-h2 em{font-style:italic;color:var(--gold);}
+.output-sub{font-size:14px;color:rgba(245,240,232,.4);max-width:480px;margin:0 auto;}
+
+.output-grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:2rem;align-items:start;}
+#finalCanvas{display:block;width:100%;height:600px;border-radius:16px;background:#111418;cursor:grab;}
+#finalCanvas:active{cursor:grabbing;}
+.output-panel{display:flex;flex-direction:column;gap:16px;}
+.out-card{
+  background:rgba(245,240,232,.04);border:1px solid rgba(245,240,232,.08);
+  border-radius:12px;padding:20px;transition:all .2s;
+}
+.out-card:hover{background:rgba(245,240,232,.07);}
+.out-card-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,240,232,.4);margin-bottom:12px;}
+.spec-list{display:flex;flex-direction:column;gap:8px;}
+.spec-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
+.spec-key{color:rgba(245,240,232,.5);}
+.spec-val{font-family:'DM Mono',monospace;color:#F5F0E8;font-weight:500;}
+.spec-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;}
+.cost-big{font-family:'DM Serif Display',serif;font-size:3rem;color:var(--gold);line-height:1;}
+.cost-sub{font-size:12px;color:rgba(245,240,232,.35);margin-top:6px;}
+.progress-bar{background:rgba(245,240,232,.08);border-radius:4px;height:6px;overflow:hidden;margin-top:6px;}
+.progress-fill{height:100%;border-radius:4px;transition:width 1.5s ease;}
+.export-btns{display:flex;flex-direction:column;gap:8px;}
+.exp-btn{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.12);
+  border-radius:8px;padding:12px 16px;cursor:pointer;transition:all .2s;
+  font-family:'Barlow',sans-serif;font-size:12px;color:rgba(245,240,232,.7);
+  text-align:left;width:100%;
+}
+.exp-btn:hover{background:rgba(245,240,232,.1);color:#F5F0E8;}
+.exp-btn-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.exp-info .exp-title{font-weight:600;color:#F5F0E8;font-size:12px;}
+.exp-info .exp-sub{font-size:10px;color:rgba(245,240,232,.35);margin-top:1px;}
+
+/* footer */
+footer{
+  background:var(--stone);color:rgba(245,240,232,.35);
+  text-align:center;padding:2rem;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;
+  border-top:1px solid rgba(181,101,29,.2);
+}
+
+/* animations */
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+@keyframes floatIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0);}50%{transform:rotate(45deg) translateY(5px);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+@keyframes pblink{0%,100%{opacity:1;}50%{opacity:.2;}}
+@keyframes countUp{from{opacity:0;}to{opacity:1;}}
+
+/* responsive */
+@media(max-width:1100px){
+  .main-grid{grid-template-columns:1fr;}
+  .metrics-row{grid-template-columns:repeat(2,1fr);}
+  .panels-2col{grid-template-columns:1fr;}
+  .viewer-body-wrap{grid-template-columns:1fr;}
+  .int-main{grid-template-columns:1fr;}
+  .output-grid{grid-template-columns:1fr;}
+  .features-grid{grid-template-columns:1fr;}
+  .float-tag{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LANDING PAGE ═══════════════ -->
+<section id="landing">
+  <canvas id="bgCanvas"></canvas>
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <rect x="2" y="11" width="20" height="11" rx="1.5" fill="#B5651D" opacity=".8"/>
+          <path d="M1 12L12 3l11 9" stroke="#F5F0E8" stroke-width="1.8" stroke-linecap="round"/>
+          <rect x="8" y="16" width="8" height="6" fill="#2C2A25" opacity=".5"/>
+          <circle cx="4" cy="11" r="1.2" fill="#B5651D"/>
+          <circle cx="20" cy="11" r="1.2" fill="#B5651D"/>
+        </svg>
+      </div>
+      <div class="nav-text">
+        <div class="name">StructAI Designer</div>
+        <div class="sub">Layout Optimizer System</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#interior">Interior</a>
+      <a href="#output">Output</a>
+      <a href="/soil">Soil & FSI Analysis</a>
+      <a href="/floorplan">2D Floor Plan</a>
+      <a href="/column-grid">3D Column Grid</a>
+    </div>
+    <button class="nav-cta" onclick="const el=document.getElementById('dashboard'); if(el) el.scrollIntoView({behavior:'smooth'})">Launch App →</button>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">AI-Powered Structural Intelligence</div>
+    <h1 class="hero-h1">Build <em>Smarter.</em><br>Design Better.</h1>
+    <p class="hero-sub">India's most advanced residential layout optimizer. Generate structurally sound, cost-efficient building designs in seconds using AI.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="const el=document.getElementById('dashboard'); if(el) el.scrollIntoView({behavior:'smooth'})">Start Designing →</button>
+      <button class="btn-secondary" onclick="const el=document.getElementById('features'); if(el) el.scrollIntoView({behavior:'smooth'})">See Features</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num" data-target="87">0</div><div class="stat-lbl">Safety Score</div></div>
+      <div class="stat-item"><div class="stat-num" data-target="14">0</div><div class="stat-lbl">% Material Saved</div></div>
+      <div class="stat-item"><div class="stat-num" data-target="6">0</div><div class="stat-lbl">Lakhs Saved</div></div>
+    </div>
+  </div>
+
+  <div class="float-tag ft1">🏗️ <span>Safety Score:</span> 87/100</div>
+  <div class="float-tag ft2">📐 <span>M25 · Fe500</span> Grade</div>
+  <div class="float-tag ft3">💰 <span>₹6.4L</span> Optimized</div>
+  <div class="float-tag ft4">🧱 <span>16 Columns</span> Grid</div>
+
+  <div class="scroll-hint" onclick="const el=document.getElementById('features'); if(el) el.scrollIntoView({behavior:'smooth'})">
+    <span>Scroll to explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ FEATURES SECTION ═══════════════ -->
+<section id="features">
+  <div class="features-grid">
+    <div class="features-left">
+      <div class="sec-eyebrow">Why StructAI?</div>
+      <h2>Structural <em>intelligence</em> meets design freedom.</h2>
+      <p>StructAI combines finite element analysis with generative design algorithms to produce optimized building layouts that are structurally safe, cost-efficient, and architecturally beautiful.</p>
+      <div class="feat-list">
+        <div class="feat-item"><div class="feat-icon" style="background:#EEF4F7;">🏗️</div><div class="feat-text"><div class="ft-title">AI Column Optimization</div><div class="ft-desc">Reduces column count by 15–25% while maintaining structural integrity via load path analysis.</div></div></div>
+        <div class="feat-item"><div class="feat-icon" style="background:#F7EDDE;">📐</div><div class="feat-text"><div class="ft-title">3D Structural Modeling</div><div class="ft-desc">Real-time Three.js rendering with clickable element inspection and floor-by-floor analysis.</div></div></div>
+        <div class="feat-item"><div class="feat-icon" style="background:#EEF7F0;">💰</div><div class="feat-text"><div class="ft-title">Cost Intelligence</div><div class="ft-desc">Material quantity estimation with per-floor breakdowns and budget adherence tracking.</div></div></div>
+        <div class="feat-item"><div class="feat-icon" style="background:#F0EEF7;">🎨</div><div class="feat-text"><div class="ft-title">Interior Design Studio</div><div class="ft-desc">Room-by-room 3D interior visualization with style presets, material palettes, and furnishing options.</div></div></div>
+      </div>
+    </div>
+    <div class="features-right">
+      <div class="mini-card"><div class="mc-icon">⚡</div><div class="mc-title">Processing Speed</div><div class="mc-val">&lt;2s</div><div class="mc-sub">Full structural analysis</div></div>
+      <div class="mini-card"><div class="mc-icon">🎯</div><div class="mc-title">Accuracy</div><div class="mc-val">97.3%</div><div class="mc-sub">vs manual calc</div></div>
+      <div class="mini-card"><div class="mc-icon">🏘️</div><div class="mc-title">Configurations</div><div class="mc-val">1–4 BHK</div><div class="mc-sub">G+1 to G+4</div></div>
+      <div class="mini-card"><div class="mc-icon">📊</div><div class="mc-title">Standards</div><div class="mc-val">IS 456</div><div class="mc-sub">IS 875 compliant</div></div>
+      <div class="mini-card" style="grid-column:span 2;"><div class="mc-icon">🏆</div><div class="mc-title">Optimization Metrics</div><div class="mc-val">₹38.6L avg savings on ₹45L budget</div><div class="mc-sub">14% material reduction · Safety score 87+</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<section id="dashboard">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">
+        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+          <rect x="2" y="9" width="16" height="9" rx="1" fill="#B5651D" opacity=".8"/>
+          <path d="M1 10L10 3l9 7" stroke="#F5F0E8" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="7" y="13" width="6" height="5" fill="#2C2A25" opacity=".5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">StructAI Designer</div>
+        <div class="brand-sub">Smart House Optimization System</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span><span class="status-dot"></span>Engine Active</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(245,240,232,.4);">v2.1.0</span>
+      <span>Project: PLOT-042</span>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div>
+        <div class="sec-title">Building Parameters</div>
+        <div class="input-group">
+          <div class="input-row">
+            <span class="input-label">Plot Size (L × W in meters)</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <input class="ifield" type="number" id="plot_length" value="12" placeholder="Length"/>
+              <input class="ifield" type="number" id="plot_width" value="9" placeholder="Width"/>
+            </div>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Number of Floors</span>
+            <select class="ifield" id="floors">
+              <option value="G+1">G+1 (2 floors)</option>
+              <option value="G+2" selected>G+2 (3 floors)</option>
+              <option value="G+3">G+3 (4 floors)</option>
+              <option value="G+4">G+4 (5 floors)</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Configuration</span>
+            <select class="ifield" id="bhk">
+              <option value="1 BHK">1 BHK</option>
+              <option value="2 BHK" selected>2 BHK</option>
+              <option value="3 BHK">3 BHK</option>
+              <option value="4 BHK">4 BHK</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Building Style</span>
+            <select class="ifield" id="style">
+              <option value="Modern" selected>Modern</option>
+              <option value="Traditional">Traditional</option>
+              <option value="Colonial">Colonial</option>
+              <option value="Minimalist">Minimalist</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title">Structural Constraints</div>
+        <div class="input-group">
+          <div class="input-row">
+            <span class="input-label">Max Beam Span (m)</span>
+            <div class="range-row">
+              <input type="range" id="max_beam_span" min="3" max="8" value="5" step="1" oninput="document.getElementById('bv').textContent=this.value"/>
+              <span class="range-val" id="bv">5</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Column Spacing (m)</span>
+            <div class="range-row">
+              <input type="range" id="column_spacing" min="2" max="6" value="3" step="1" oninput="document.getElementById('cv').textContent=this.value"/>
+              <span class="range-val" id="cv">3</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Allowable Deflection (mm)</span>
+            <input class="ifield" id="allowable_deflection" type="number" value="25"/>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title">Materials</div>
+        <div class="input-group">
+          <div class="input-row">
+            <span class="input-label">Concrete Grade</span>
+            <select class="ifield" id="concrete_grade">
+              <option value="M20">M20</option><option value="M25" selected>M25</option><option value="M30">M30</option><option value="M35">M35</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Steel Grade</span>
+            <select class="ifield" id="steel_grade">
+              <option value="Fe415">Fe415</option><option value="Fe500" selected>Fe500</option><option value="Fe550">Fe550</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Budget (₹ Lakhs)</span>
+            <input class="ifield" id="budget_lakhs" type="number" value="45"/>
+          </div>
+          <div class="input-row">
+            <span class="input-label">Seismic Zone (IS 1893)</span>
+            <select class="ifield" id="seismic_zone">
+              <option value="II">Zone II (Low)</option>
+              <option value="III" selected>Zone III (Moderate)</option>
+              <option value="IV">Zone IV (High)</option>
+              <option value="V">Zone V (Very High)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="gen-btn" onclick="regenerate()">↻ Re-Generate Design</button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area visual-results">
+      <!-- workflow -->
+      <div class="workflow-steps">
+        <div class="wf-step done"><span class="wf-num">01</span>Input</div>
+        <div class="arrow-sep done"></div>
+        <div class="wf-step done"><span class="wf-num">02</span>Layout</div>
+        <div class="arrow-sep done"></div>
+        <div class="wf-step active"><span class="wf-num">03</span>Optimize</div>
+        <div class="arrow-sep active"></div>
+        <div class="wf-step"><span class="wf-num">04</span>Analysis</div>
+        <div class="arrow-sep"></div>
+        <div class="wf-step"><span class="wf-num">05</span>3D Model</div>
+        <div class="arrow-sep"></div>
+        <div class="wf-step"><span class="wf-num">06</span>Report</div>
+      </div>
+
+      <!-- metrics -->
+      <div class="metrics-row">
+        <div class="metric-card mc-safety">
+          <div class="m-label">Safety Score</div>
+          <div class="m-value">87<span style="font-size:14px;color:var(--cement)">/100</span></div>
+          <div class="m-sub">Structurally Stable</div>
+          <span class="badge bg">Approved</span>
+        </div>
+        <div class="metric-card mc-cols">
+          <div class="m-label">Columns</div>
+          <div class="m-value">16</div>
+          <div class="m-sub">Optimized grid</div>
+          <span class="badge bb">−4 vs baseline</span>
+        </div>
+        <div class="metric-card mc-cost">
+          <div class="m-label">Est. Cost</div>
+          <div class="m-value">₹38.6<span style="font-size:14px;color:var(--cement)">L</span></div>
+          <div class="m-sub">Within ₹45L budget</div>
+          <span class="badge ba">₹6.4L saved</span>
+        </div>
+        <div class="metric-card mc-save">
+          <div class="m-label">Material Saved</div>
+          <div class="m-value">14<span style="font-size:14px;color:var(--cement)">%</span></div>
+          <div class="m-sub">vs. unoptimized</div>
+          <span class="badge br">High Efficiency</span>
+        </div>
+      </div>
+
+      <!-- floor plan + structural -->
+      <div class="panels-2col">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">2D Floor Plan — Ground Floor</span>
+            <span class="panel-tag">2 BHK · 12×9m</span>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--cement);">
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;background:var(--steel);border-radius:50%;border:1.5px solid var(--stone);display:inline-block;"></span>Column</span>
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:14px;height:1.5px;background:rgba(61,90,108,.4);display:inline-block;"></span>Beam</span>
+            </div>
+            <div class="floor-plan">
+              <div class="room room-living"><div class="col-dot ctlp"></div><div class="col-dot ctrp"></div><div class="beam-h"></div><div class="room-name">Living / Dining</div><div class="room-size">5.4 × 3.6 m</div></div>
+              <div class="room room-bed1"><div class="col-dot ctlp"></div><div class="col-dot ctrp"></div><div class="col-dot cblp"></div><div class="col-dot cbrp"></div><div class="beam-h"></div><div class="beam-v"></div><div class="room-name">Bedroom 1</div><div class="room-size">3.6 × 3.6 m</div></div>
+              <div class="room room-bed2"><div class="col-dot ctlp"></div><div class="col-dot ctrp"></div><div class="col-dot cblp"></div><div class="col-dot cbrp"></div><div class="beam-h"></div><div class="beam-v"></div><div class="room-name">Bedroom 2</div><div class="room-size">3.6 × 3.6 m</div></div>
+              <div class="room room-kitchen"><div class="col-dot ctlp"></div><div class="col-dot ctrp"></div><div class="col-dot cblp"></div><div class="col-dot cbrp"></div><div class="room-name">Kitchen</div><div class="room-size">2.7 × 2.7 m</div></div>
+              <div class="room room-bath"><div class="col-dot ctlp"></div><div class="col-dot ctrp"></div><div class="col-dot cblp"></div><div class="col-dot cbrp"></div><div class="room-name">Bathroom</div><div class="room-size">1.8 × 2.1 m</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Structural Analysis</span>
+            <span class="panel-tag">M25 · Fe500</span>
+          </div>
+          <div class="panel-body">
+            <table class="s-table">
+              <thead><tr><th>Parameter</th><th>Value</th><th style="text-align:right">Status</th></tr></thead>
+              <tbody>
+                <tr><td>Max Beam Span</td><td><div style="font-family:'DM Mono',monospace;font-size:11px;">4.8 m</div><div class="pb-wrap" style="width:100px"><div class="pb-fill" style="width:72%;background:var(--lime)"></div></div></td><td><span class="badge bg">Safe</span></td></tr>
+                <tr><td>Deflection</td><td><div style="font-family:'DM Mono',monospace;font-size:11px;">18 mm</div><div class="pb-wrap" style="width:100px"><div class="pb-fill" style="width:55%;background:var(--lime)"></div></div></td><td><span class="badge bg">OK</span></td></tr>
+                <tr><td>Column Load</td><td><div style="font-family:'DM Mono',monospace;font-size:11px;">320 kN</div><div class="pb-wrap" style="width:100px"><div class="pb-fill" style="width:65%;background:var(--sky)"></div></div></td><td><span class="badge bb">Nominal</span></td></tr>
+                <tr><td>Slab Thickness</td><td><div style="font-family:'DM Mono',monospace;font-size:11px;">125 mm</div><div class="pb-wrap" style="width:100px"><div class="pb-fill" style="width:80%;background:var(--copper)"></div></div></td><td><span class="badge ba">Standard</span></td></tr>
+                <tr><td>Shear Capacity</td><td><div style="font-family:'DM Mono',monospace;font-size:11px;">485 kN</div><div class="pb-wrap" style="width:100px"><div class="pb-fill" style="width:88%;background:var(--rust)"></div></div></td><td><span class="badge br">Review</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D VIEWER -->
+      <div class="viewer-full">
+        <div class="panel-head">
+          <span class="panel-title">3D Structural Model — G+2 Building</span>
+          <span class="panel-tag">Full 360° · Click column to inspect</span>
+        </div>
+        <div class="viewer-body-wrap">
+          <canvas id="threeCanvas"></canvas>
+          <div class="v-controls">
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Auto Rotation</div>
+              <div class="r-row">
+                <button class="r-btn active-rb" id="rotOnBtn" onclick="setAutoRot(true)">ON</button>
+                <button class="r-btn" id="rotOffBtn" onclick="setAutoRot(false)">OFF</button>
+              </div>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Nudge</div>
+              <div class="r-row">
+                <button class="r-btn" onclick="nudge('h',-1)">◁</button>
+                <button class="r-btn" onclick="nudge('h',1)">▷</button>
+                <button class="r-btn" onclick="nudge('v',-1)">▲</button>
+                <button class="r-btn" onclick="nudge('v',1)">▼</button>
+              </div>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Rotation Mode</div>
+              <div class="fl-btns" id="modeBtns">
+                <button class="fl-btn active" onclick="setMode('h360',this)">Horizontal 360°</button>
+                <button class="fl-btn" onclick="setMode('v360',this)">Vertical 360°</button>
+                <button class="fl-btn" onclick="setMode('both',this)">Combined Orbit</button>
+              </div>
+            </div>
+            <div class="v-ctrl-sec">
+              <button class="r-btn" style="width:100%;padding:7px;" onclick="resetView()">⌂ Reset View</button>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Floor View</div>
+              <div class="fl-btns">
+                <button class="fl-btn active" onclick="setFloor('all',this)">All Floors</button>
+                <button class="fl-btn" onclick="setFloor(0,this)">Ground Floor</button>
+                <button class="fl-btn" onclick="setFloor(1,this)">Floor 1</button>
+                <button class="fl-btn" onclick="setFloor(2,this)">Floor 2</button>
+              </div>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Elements</div>
+              <div class="v-toggle-row"><span style="display:flex;align-items:center;gap:6px;"><span class="v-dot" style="background:#3D5A6C;"></span>Columns</span><button class="tog-btn on" onclick="toggleEl('columns',this)"></button></div>
+              <div class="v-toggle-row"><span style="display:flex;align-items:center;gap:6px;"><span class="v-dot" style="background:#8B5E2A;"></span>Beams</span><button class="tog-btn on" onclick="toggleEl('beams',this)"></button></div>
+              <div class="v-toggle-row"><span style="display:flex;align-items:center;gap:6px;"><span class="v-dot" style="background:#8BA89A;"></span>Slabs</span><button class="tog-btn on" onclick="toggleEl('slabs',this)"></button></div>
+              <div class="v-toggle-row"><span style="display:flex;align-items:center;gap:6px;"><span class="v-dot" style="background:#C9B99A;"></span>Walls</span><button class="tog-btn on" onclick="toggleEl('walls',this)"></button></div>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Column Info</div>
+              <div style="font-size:11px;color:var(--cement);">Click any column to inspect.</div>
+              <div class="col-info" id="colInfoBox">
+                <span class="pulse-badge"></span><span id="colInfoTitle">—</span><br>
+                <span id="colInfoBody" style="white-space:pre-line;"></span>
+              </div>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Metrics</div>
+              <div class="mm-card"><div class="mm-lbl">Columns</div><div class="mm-val">16 total</div></div>
+              <div class="mm-card"><div class="mm-lbl">Avg beam span</div><div class="mm-val">4.8 m</div></div>
+              <div class="mm-card"><div class="mm-lbl">Slab thickness</div><div class="mm-val">125 mm</div></div>
+            </div>
+            <div class="v-ctrl-sec">
+              <div class="v-ctrl-label">Legend</div>
+              <div class="v-leg-items">
+                <div class="v-leg-item"><span class="v-leg-sq" style="background:#3D5A6C;"></span>Column (RCC)</div>
+                <div class="v-leg-item"><span class="v-leg-sq" style="background:#FFD580;"></span>Column (selected)</div>
+                <div class="v-leg-item"><span class="v-leg-sq" style="background:#8B5E2A;"></span>Beam (RCC)</div>
+                <div class="v-leg-item"><span class="v-leg-sq" style="background:#8BA89A;"></span>Slab</div>
+                <div class="v-leg-item"><span class="v-leg-sq" style="background:#C9B99A;"></span>Walls</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="v-footer">
+          <span>Drag to orbit</span><span style="opacity:.3">|</span>
+          <span>Scroll to zoom</span><span style="opacity:.3">|</span>
+          <span>Click column to inspect</span><span style="opacity:.3">|</span>
+          <span id="viewInfo">Auto-rotating · Horizontal 360°</span>
+        </div>
+      </div>
+
+      <!-- charts -->
+      <div class="panels-2col">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">Optimization Comparison</span><span class="panel-tag">Before vs After</span></div>
+          <div class="panel-body">
+            <div class="comp-row" style="margin-bottom:12px;">
+              <div class="comp-block"><div class="comp-lbl">Before</div><div class="comp-val">₹44.9L</div><div class="comp-diff diff-b">20 cols · 85% mat.</div></div>
+              <div class="comp-block" style="border-color:var(--lime);background:#EEF4EF;"><div class="comp-lbl" style="color:var(--lime);">After</div><div class="comp-val" style="color:var(--lime);">₹38.6L</div><div class="comp-diff diff-g">16 cols · 71% mat.</div></div>
+            </div>
+            <div class="leg-row"><span class="leg-item"><span class="leg-sq" style="background:#5B8FA8;"></span>Before</span><span class="leg-item"><span class="leg-sq" style="background:#4A7C59;"></span>After</span></div>
+            <div style="position:relative;height:150px;"><canvas id="compChart"></canvas></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">Material Usage</span><span class="panel-tag">Per Floor Estimate</span></div>
+          <div class="panel-body">
+            <div class="leg-row"><span class="leg-item"><span class="leg-sq" style="background:#3D5A6C;"></span>Concrete (m³)</span><span class="leg-item"><span class="leg-sq" style="background:#B5651D;"></span>Steel (quintals)</span></div>
+            <div style="position:relative;height:170px;"><canvas id="matChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ INTERIOR DESIGN ═══════════════ -->
+<section id="interior">
+  <div class="int-header">
+    <div class="int-eyebrow">Interior Design Studio</div>
+    <h2 class="int-h2">Visualize your <em>living spaces</em></h2>
+    <p class="int-sub">Design every room with real-time 3D visualization. Choose styles, materials, colors, and furnishings for your optimized layout.</p>
+  </div>
+  <div class="int-main">
+    <div class="int-controls">
+
+      <div class="int-sec">
+        <div class="int-sec-title">Select Room</div>
+        <div class="room-btns">
+          <button class="room-btn active" onclick="selectRoom('living',this)">🛋️ Living</button>
+          <button class="room-btn" onclick="selectRoom('bedroom1',this)">🛏️ Bedroom 1</button>
+          <button class="room-btn" onclick="selectRoom('bedroom2',this)">🛏️ Bedroom 2</button>
+          <button class="room-btn" onclick="selectRoom('kitchen',this)">🍳 Kitchen</button>
+          <button class="room-btn" onclick="selectRoom('bathroom',this)">🚿 Bathroom</button>
+          <button class="room-btn" onclick="selectRoom('exterior',this)">🏡 Exterior</button>
+        </div>
+      </div>
+
+      <div class="int-sec">
+        <div class="int-sec-title">Design Style</div>
+        <div class="style-strip">
+          <div class="style-opt active" onclick="selectStyle('modern',this)">
+            <div class="style-swatch" style="background:linear-gradient(135deg,#2C3E50,#BDC3C7);"></div>
+            <div class="style-info"><div class="style-name">Modern Minimal</div><div class="style-desc">Clean lines, neutral tones</div></div>
+          </div>
+          <div class="style-opt" onclick="selectStyle('warm',this)">
+            <div class="style-swatch" style="background:linear-gradient(135deg,#C8A26A,#8B4513);"></div>
+            <div class="style-info"><div class="style-name">Warm Traditional</div><div class="style-desc">Wood tones, earthy palette</div></div>
+          </div>
+          <div class="style-opt" onclick="selectStyle('luxury',this)">
+            <div class="style-swatch" style="background:linear-gradient(135deg,#1A1A2E,#D4AF37);"></div>
+            <div class="style-info"><div class="style-name">Luxury Contemporary</div><div class="style-desc">Dark base, gold accents</div></div>
+          </div>
+          <div class="style-opt" onclick="selectStyle('nature',this)">
+            <div class="style-swatch" style="background:linear-gradient(135deg,#4A7C59,#C8A26A);"></div>
+            <div class="style-info"><div class="style-name">Biophilic Natural</div><div class="style-desc">Plants, stone, organic shapes</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="int-sec">
+        <div class="int-sec-title">Color Palette</div>
+        <div class="color-palettes">
+          <div class="palette-row">
+            <span class="palette-name">Walls</span>
+            <div class="palette-colors">
+              <div class="swatch active" style="background:#F5F0E8;" onclick="setColor('wall','#F5F0E8',this)" title="Cream"></div>
+              <div class="swatch" style="background:#E8E3D8;" onclick="setColor('wall','#E8E3D8',this)" title="Sand"></div>
+              <div class="swatch" style="background:#D4C5B0;" onclick="setColor('wall','#D4C5B0',this)" title="Beige"></div>
+              <div class="swatch" style="background:#2C3E50;" onclick="setColor('wall','#2C3E50',this)" title="Slate"></div>
+              <div class="swatch" style="background:#4A7C59;" onclick="setColor('wall','#4A7C59',this)" title="Sage"></div>
+            </div>
+          </div>
+          <div class="palette-row">
+            <span class="palette-name">Floor</span>
+            <div class="palette-colors">
+              <div class="swatch active" style="background:#C8A26A;" onclick="setColor('floor','#C8A26A',this)" title="Oak"></div>
+              <div class="swatch" style="background:#8B6914;" onclick="setColor('floor','#8B6914',this)" title="Walnut"></div>
+              <div class="swatch" style="background:#E8E3D8;" onclick="setColor('floor','#E8E3D8',this)" title="Marble"></div>
+              <div class="swatch" style="background:#5C5C5C;" onclick="setColor('floor','#5C5C5C',this)" title="Charcoal"></div>
+              <div class="swatch" style="background:#D4B896;" onclick="setColor('floor','#D4B896',this)" title="Travertine"></div>
+            </div>
+          </div>
+          <div class="palette-row">
+            <span class="palette-name">Ceiling</span>
+            <div class="palette-colors">
+              <div class="swatch active" style="background:#FFFFFF;" onclick="setColor('ceiling','#FFFFFF',this)"></div>
+              <div class="swatch" style="background:#F5F0E8;" onclick="setColor('ceiling','#F5F0E8',this)"></div>
+              <div class="swatch" style="background:#E8D5C0;" onclick="setColor('ceiling','#E8D5C0',this)"></div>
+              <div class="swatch" style="background:#1A1A2E;" onclick="setColor('ceiling','#1A1A2E',this)"></div>
+              <div class="swatch" style="background:#2C3E50;" onclick="setColor('ceiling','#2C3E50',this)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="int-sec">
+        <div class="int-sec-title">Furnishings</div>
+        <div class="furnishing-grid">
+          <div class="furn-item active" onclick="this.classList.toggle('active')"><div class="furn-icon">🛋️</div><div class="furn-name">Sofa</div></div>
+          <div class="furn-item active" onclick="this.classList.toggle('active')"><div class="furn-icon">🪑</div><div class="furn-name">Chairs</div></div>
+          <div class="furn-item active" onclick="this.classList.toggle('active')"><div class="furn-icon">🪴</div><div class="furn-name">Plants</div></div>
+          <div class="furn-item" onclick="this.classList.toggle('active')"><div class="furn-icon">🖼️</div><div class="furn-name">Art</div></div>
+          <div class="furn-item active" onclick="this.classList.toggle('active')"><div class="furn-icon">💡</div><div class="furn-name">Lighting</div></div>
+          <div class="furn-item" onclick="this.classList.toggle('active')"><div class="furn-icon">📚</div><div class="furn-name">Shelves</div></div>
+          <div class="furn-item" onclick="this.classList.toggle('active')"><div class="furn-icon">🪟</div><div class="furn-name">Curtains</div></div>
+          <div class="furn-item" onclick="this.classList.toggle('active')"><div class="furn-icon">🪞</div><div class="furn-name">Mirror</div></div>
+        </div>
+      </div>
+
+      <button class="apply-btn" onclick="applyInteriorDesign()">✨ Apply Design</button>
+    </div>
+
+    <div class="int-viewer-wrap">
+      <canvas id="intCanvas"></canvas>
+      <div class="int-overlay">
+        <div class="int-room-label" id="roomLabel">Living / Dining Room</div>
+        <div class="int-style-badge" id="styleBadge">Modern Minimal</div>
+      </div>
+    </div>
+  </div>
+  <div class="int-footer">
+    <span>Drag to rotate · Scroll to zoom</span>
+    <span style="opacity:.3">|</span>
+    <span>12×9m plot · G+2 Building</span>
+    <span style="opacity:.3">|</span>
+    <span>Real-time material preview</span>
+  </div>
+</section>
+
+<!-- ═══════════════ FINAL OUTPUT ═══════════════ -->
+<section id="output">
+  <div class="output-header">
+    <div class="output-eyebrow">Final Output</div>
+    <h2 class="output-h2">Your Complete<br><em>Building Design</em></h2>
+    <p class="output-sub">Structurally optimized, beautifully designed — ready for construction documentation.</p>
+  </div>
+  <div class="output-grid">
+    <canvas id="finalCanvas"></canvas>
+    <div class="output-panel">
+      <div class="out-card">
+        <div class="out-card-title">Cost Summary</div>
+        <div class="cost-big">₹38.6L</div>
+        <div class="cost-sub">Total optimized project cost · ₹6.4L saved</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:86%;background:var(--lime);"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(245,240,232,.35);margin-top:4px;font-family:'DM Mono',monospace;"><span>₹0</span><span>₹45L budget</span></div>
+      </div>
+      <div class="out-card">
+        <div class="out-card-title">Design Specifications</div>
+        <div class="spec-list">
+          <div class="spec-item"><span class="spec-key">Plot Size</span><span class="spec-val">12 × 9 m</span></div>
+          <div class="spec-item"><span class="spec-key">Configuration</span><span class="spec-val">2 BHK · G+2</span></div>
+          <div class="spec-item"><span class="spec-key">Total Area</span><span class="spec-val">324 m²</span></div>
+          <div class="spec-item"><span class="spec-key">Columns</span><span class="spec-val">16 (optimized)</span></div>
+          <div class="spec-item"><span class="spec-key">Concrete Grade</span><span class="spec-val">M25</span></div>
+          <div class="spec-item"><span class="spec-key">Steel Grade</span><span class="spec-val">Fe500</span></div>
+          <div class="spec-item"><span class="spec-key">Safety Score</span><span class="spec-val"><span class="spec-badge" style="background:#E6F2EA;color:#4A7C59;">87/100 ✓</span></span></div>
+        </div>
+      </div>
+      <div class="out-card">
+        <div class="out-card-title">Compliance</div>
+        <div class="spec-list">
+          <div class="spec-item"><span class="spec-key">IS 456:2000</span><span class="spec-val"><span class="spec-badge" style="background:#E6F2EA;color:#4A7C59;">✓ Compliant</span></span></div>
+          <div class="spec-item"><span class="spec-key">IS 875 Part 2</span><span class="spec-val"><span class="spec-badge" style="background:#E6F2EA;color:#4A7C59;">✓ Compliant</span></span></div>
+          <div class="spec-item"><span class="spec-key">NBC 2016</span><span class="spec-val"><span class="spec-badge" style="background:#E6F2EA;color:#4A7C59;">✓ Compliant</span></span></div>
+          <div class="spec-item"><span class="spec-key">Seismic Zone</span><span class="spec-val">Zone III · OK</span></div>
+        </div>
+      </div>
+      <div class="out-card">
+        <div class="out-card-title">Export Options</div>
+        <div class="export-btns">
+          <button class="exp-btn" onclick="exportFile('pdf', this)"><div class="exp-btn-icon" style="background:rgba(181,101,29,.2);">📄</div><div class="exp-info"><div class="exp-title">Structural Report (PDF)</div><div class="exp-sub">Full analysis + BOQ + drawings</div></div></button>
+          <button class="exp-btn" onclick="exportFile('dwg', this)"><div class="exp-btn-icon" style="background:rgba(61,90,108,.2);">📐</div><div class="exp-info"><div class="exp-title">CAD Files (.DWG)</div><div class="exp-sub">Floor plans + sections + elevations</div></div></button>
+          <button class="exp-btn" onclick="exportFile('xls', this)"><div class="exp-btn-icon" style="background:rgba(74,124,89,.2);">📊</div><div class="exp-info"><div class="exp-title">Material Schedule (XLS)</div><div class="exp-sub">Quantities + cost breakdown</div></div></button>
+          <button class="exp-btn" onclick="exportFile('glb', this)"><div class="exp-btn-icon" style="background:rgba(91,143,168,.2);">🧊</div><div class="exp-info"><div class="exp-title">3D Model (.GLB)</div><div class="exp-sub">Full building + interior design</div></div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="font-family:'DM Serif Display',serif;font-size:14px;color:rgba(245,240,232,.4);margin-bottom:6px;">StructAI Designer</div>
+  Smart House Layout Optimization System · Hackathon Edition · Built with ❤️ for India's Construction Future
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // ── Global State ──
+  let currentRoom = 'living';
+  let currentStyle = 'modern';
+  let currentProjectId = null;
+  const intColors = { wall: 0xF5F0E8, floor: 0xC8A26A, ceiling: 0xFFFFFF };
+  const charts = { comp: null, mat: null };
+
+/* ═══ LANDING CANVAS ANIMATION ═══ */
+(function(){
+  const c=document.getElementById('bgCanvas');
+  const ctx=c.getContext('2d');
+  let W,H,particles=[],grid=[];
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+
+  // Grid lines
+  function drawGrid(){
+    ctx.strokeStyle='rgba(181,101,29,0.04)';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  }
+
+  // Floating particles
+  for(let i=0;i<80;i++){
+    particles.push({
+      x:Math.random()*2000,y:Math.random()*900,
+      vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+      r:Math.random()*2+.5,
+      a:Math.random()*.5+.1,
+      col:Math.random()>.5?'181,101,29':'61,90,108'
+    });
+  }
+
+  // Animated building wireframe nodes
+  const nodes=[];
+  const bx=W*.6,by=H*.15,bw=W*.3,bh=H*.65,fl=3,cols=4,rows=3;
+  for(let f=0;f<=fl;f++){
+    for(let c2=0;c2<cols;c2++){
+      for(let r=0;r<rows;r++){
+        nodes.push({
+          x3:c2/(cols-1),y3:f/fl,z3:r/(rows-1),
+          px:0,py:0,
+          glow:Math.random()*Math.PI*2
+        });
+      }
+    }
+  }
+
+  let t=0;
+  function project(x3,y3,z3,ang){
+    const cosA=Math.cos(ang),sinA=Math.sin(ang);
+    const rx=x3*cosA-z3*sinA;
+    const ry=y3;
+    const rz=x3*sinA+z3*cosA+2;
+    const scale=bw*.55/rz;
+    return{px:bx+bw*.5+rx*scale*bw*.55,py:by+bh*.9-ry*bh*.8};
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // BG gradient
+    const g=ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,Math.max(W,H)*.7);
+    g.addColorStop(0,'#141820');g.addColorStop(1,'#0A0C10');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+    drawGrid();
+
+    // particles
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.col},${p.a})`;ctx.fill();
+    });
+
+    const ang=t*.003+Math.PI*.2;
+
+    // Project nodes
+    nodes.forEach(n=>{
+      const {px,py}=project(n.x3-.5,n.y3,n.z3-.5,ang);
+      n.px=px;n.py=py;
+    });
+
+    // Draw structural lines
+    const ppr=cols*rows;
+    for(let f=0;f<=fl;f++){
+      for(let c2=0;c2<cols;c2++){
+        for(let r=0;r<rows;r++){
+          const i=f*ppr+c2*rows+r;
+          const n=nodes[i];
+          // beams X
+          if(c2<cols-1){
+            const n2=nodes[f*ppr+(c2+1)*rows+r];
+            ctx.strokeStyle=`rgba(181,101,29,${f<fl?.12:.06})`;
+            ctx.lineWidth=f<fl?.8:.5;
+            ctx.beginPath();ctx.moveTo(n.px,n.py);ctx.lineTo(n2.px,n2.py);ctx.stroke();
+          }
+          // beams Z
+          if(r<rows-1){
+            const n2=nodes[f*ppr+c2*rows+r+1];
+            ctx.strokeStyle=`rgba(61,90,108,${f<fl?.1:.05})`;
+            ctx.lineWidth=.6;
+            ctx.beginPath();ctx.moveTo(n.px,n.py);ctx.lineTo(n2.px,n2.py);ctx.stroke();
+          }
+          // columns
+          if(f<fl){
+            const n2=nodes[(f+1)*ppr+c2*rows+r];
+            const alpha=.2+.1*Math.sin(t*.05+c2+r);
+            ctx.strokeStyle=`rgba(245,240,232,${alpha})`;
+            ctx.lineWidth=.8;
+            ctx.beginPath();ctx.moveTo(n.px,n.py);ctx.lineTo(n2.px,n2.py);ctx.stroke();
+          }
+        }
+      }
+    }
+
+    // Draw column nodes
+    nodes.forEach((n,i)=>{
+      const f=Math.floor(i/ppr);
+      const pulse=.4+.3*Math.sin(t*.08+n.glow);
+      ctx.beginPath();ctx.arc(n.px,n.py,f===fl?3:2,0,Math.PI*2);
+      ctx.fillStyle=f===fl?`rgba(181,101,29,${pulse})`:`rgba(61,90,108,${pulse})`;
+      ctx.fill();
+    });
+
+    // Scanning line
+    const scanY=by+(((t*.5)%bh));
+    const scanG=ctx.createLinearGradient(bx-50,scanY,bx+bw+50,scanY);
+    scanG.addColorStop(0,'transparent');
+    scanG.addColorStop(.3,'rgba(181,101,29,0)');
+    scanG.addColorStop(.5,'rgba(181,101,29,0.06)');
+    scanG.addColorStop(.7,'rgba(181,101,29,0)');
+    scanG.addColorStop(1,'transparent');
+    ctx.fillStyle=scanG;ctx.fillRect(bx-50,scanY-1,bw+100,2);
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ═══ STAT COUNTER ═══ */
+function animateCounters(){
+  document.querySelectorAll('[data-target]').forEach(el=>{
+    const target=parseInt(el.dataset.target);
+    let current=0;
+    const step=target/60;
+    const timer=setInterval(()=>{
+      current=Math.min(current+step,target);
+      const lbl = el.closest('.stat-item').querySelector('.stat-lbl');
+      const suffix = (lbl && lbl.textContent.includes('%')) ? '%' : '';
+      el.textContent = Math.round(current) + suffix;
+      if(current>=target)clearInterval(timer);
+    },20);
+  });
+}
+setTimeout(animateCounters,1200);
+
+/* ═══ CHARTS ═══ */
+// charts already declared globally
+charts.comp = new Chart(document.getElementById('compChart'),{
+  type:'bar',
+  data:{
+    labels:['Cost (L)','Columns','Beam Spans','Safety'],
+    datasets:[
+      {label:'Before',data:[44.9,20,6,78],backgroundColor:'#5B8FA8',borderRadius:4},
+      {label:'After', data:[38.6,16,5,87],backgroundColor:'#4A7C59',borderRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{font:{size:10},color:'#8B8880'},grid:{display:false},border:{display:false}},
+            y:{ticks:{font:{size:10},color:'#8B8880'},grid:{color:'rgba(44,42,37,0.06)'},border:{display:false}}}}
+});
+charts.mat = new Chart(document.getElementById('matChart'),{
+  type:'bar',
+  data:{
+    labels:['GF','Floor 1','Floor 2'],
+    datasets:[
+      {label:'Concrete (m³)',data:[48,44,40],backgroundColor:'#3D5A6C',borderRadius:4},
+      {label:'Steel (Qtl)', data:[18,16,14],backgroundColor:'#B5651D',borderRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{font:{size:11},color:'#8B8880'},grid:{display:false},border:{display:false}},
+            y:{ticks:{font:{size:10},color:'#8B8880'},grid:{color:'rgba(44,42,37,0.06)'},border:{display:false}}}}
+});
+
+/* ═══ STRUCTURAL 3D VIEWER ═══ */
+(function(){
+  const canvas=document.getElementById('threeCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x1A1F2B);
+
+  // Ground grid
+  const gridHelper=new THREE.GridHelper(20,20,0x2A3040,0x222530);
+  gridHelper.position.set(6,-.01,4.5);
+  scene.add(gridHelper);
+
+  const camera=new THREE.PerspectiveCamera(42,1,.1,300);
+  const target=new THREE.Vector3(6,5,4.5);
+  let theta=Math.PI/5,phi=0.72,radius=34;
+  let autoRotate=true,rotMode='h360',modeTime=0;
+  let lastX=0,lastY=0,clickMoved=false;
+
+  function updateCam(){
+    camera.position.set(
+      target.x+radius*Math.sin(theta)*Math.cos(phi),
+      target.y+radius*Math.sin(phi),
+      target.z+radius*Math.cos(theta)*Math.cos(phi)
+    );camera.lookAt(target);
+  }updateCam();
+
+  scene.add(new THREE.AmbientLight(0xffffff,.55));
+  const dl=new THREE.DirectionalLight(0xfffaf0,1.1);
+  dl.position.set(20,30,15);dl.castShadow=true;scene.add(dl);
+  scene.add(new THREE.DirectionalLight(0xb0c8d8,.35).position.set(-15,10,-10)&&dl);
+  const fl2=new THREE.DirectionalLight(0xb0c8d8,.35);fl2.position.set(-15,10,-10);scene.add(fl2);
+
+  const MC=()=>new THREE.MeshLambertMaterial({color:0x3D5A6C});
+  const MH=()=>new THREE.MeshLambertMaterial({color:0xFFD580,emissive:0xFFAA00,emissiveIntensity:.35});
+  const MB=new THREE.MeshLambertMaterial({color:0x8B5E2A});
+  const MS=new THREE.MeshLambertMaterial({color:0x8BA89A,transparent:true,opacity:.8});
+  const MW=new THREE.MeshLambertMaterial({color:0xC9B99A,transparent:true,opacity:.45});
+
+  const groups={columns:new THREE.Group(),beams:new THREE.Group(),slabs:new THREE.Group(),walls:new THREE.Group()};
+  Object.values(groups).forEach(g=>scene.add(g));
+
+  let colMeshes=[], currentCXS=[0,4,8,12], currentCZS=[0,3,6,9];
+
+  function bx(w,h,d,mat,x,y,z,grp){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+    m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;grp.add(m);return m;
+  }
+
+  window.rebuildStructural = (FLOORS, cxs, czs) => {
+    currentCXS = cxs || [0,4,8,12];
+    currentCZS = czs || [0,3,6,9];
+    // Clear existing
+    Object.values(groups).forEach(g => {
+        while(g.children.length > 0){ 
+            const obj = g.children[0];
+            if(obj.geometry) obj.geometry.dispose();
+            if(obj.material) {
+                if(Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+                else obj.material.dispose();
+            }
+            g.remove(obj); 
+        }
+    });
+    colMeshes = [];
+
+    const FH=3.2;
+    for(let f=0;f<FLOORS;f++){
+        const by=f*FH;
+        for(let xi=0;xi<currentCXS.length;xi++){
+        for(let zi=0;zi<currentCZS.length;zi++){
+            // Main RCC Column
+            const m=bx(.38,FH,.38,MC(),currentCXS[xi],by+FH/2,currentCZS[zi],groups.columns);
+            m.userData={isCol:true,floor:f,xi,zi};colMeshes.push(m);
+            
+            // Foundation Footing (only for ground floor)
+            if(f===0){
+                const footing=bx(1.2,.4,1.2,new THREE.MeshLambertMaterial({color:0x555555}),currentCXS[xi],-.2,currentCZS[zi],groups.columns);
+                footing.userData={isFooting:true,xi,zi};
+            }
+        }
+        }
+        for(let xi=0;xi<currentCXS.length;xi++)
+        for(let zi=0;zi<currentCZS.length-1;zi++){
+            const span=currentCZS[zi+1]-currentCZS[zi];
+            // Primary Beams along Z
+            bx(.28,.42,span,MB.clone(),currentCXS[xi],by+FH-.21,(currentCZS[zi]+currentCZS[zi+1])/2,groups.beams);
+        }
+        for(let zi=0;zi<currentCZS.length;zi++)
+        for(let xi=0;xi<currentCXS.length-1;xi++){
+            const span=currentCXS[xi+1]-currentCXS[xi];
+            // Primary Beams along X
+            bx(span,.42,.28,MB.clone(),(currentCXS[xi]+currentCXS[xi+1])/2,by+FH-.21,currentCZS[zi],groups.beams);
+        }
+        // Structural Slab
+        bx(currentCXS[currentCXS.length-1],.13,currentCZS[currentCZS.length-1],MS.clone(),currentCXS[currentCXS.length-1]/2,by+FH,currentCZS[currentCZS.length-1]/2,groups.slabs);
+    }
+    // Ground Plinth
+    bx(currentCXS[currentCXS.length-1]+1,.18,currentCZS[currentCZS.length-1]+1,new THREE.MeshLambertMaterial({color:0x252B38}),currentCXS[currentCXS.length-1]/2,-.09,currentCZS[currentCZS.length-1]/2,groups.slabs);
+    
+    // Boundary Walls (Wireframe aesthetic)
+    [[currentCXS[currentCXS.length-1]/2,currentCZS[currentCZS.length-1]/2,currentCXS[currentCXS.length-1],.18],[currentCXS[currentCXS.length-1]/2,-.08,currentCXS[currentCXS.length-1],.18],[currentCZS[currentCZS.length-1]/2,currentCZS[currentCZS.length-1]/2,.18,currentCZS[currentCZS.length-1]],[-0.08,currentCZS[currentCZS.length-1]/2,.18,currentCZS[currentCZS.length-1]]]
+    .forEach(([x,z,w,d])=>{for(let f=0;f<FLOORS;f++){bx(w,FH-.42,d,MW.clone(),x,f*FH+(FH-.42)/2,z,groups.walls);}});
+
+    // Update target for camera to center of building
+    target.set(currentCXS[currentCXS.length-1]/2, (FLOORS * FH) / 2, currentCZS[currentCZS.length-1]/2);
+    updateCam();
+  };
+
+  // Initial build
+  window.rebuildStructural(3, currentCXS, currentCZS);
+
+  const raycaster=new THREE.Raycaster();
+  const mouse=new THREE.Vector2();
+  let selCol=null;
+
+  function highlight(m){
+    if(selCol&&selCol!==m)selCol.material=MC();
+    if(m){
+      m.material=MH();selCol=m;
+      const d=m.userData;
+      const rows2=['A','B','C','D'],cols2=['1','2','3','4'];
+      const id=`C-${rows2[d.xi]}${cols2[d.zi]}`;
+      document.getElementById('colInfoTitle').textContent=`${id} · Floor ${d.floor+1}`;
+      document.getElementById('colInfoBody').textContent=`Grid: X${d.xi+1}-Z${d.zi+1}\nSize: 300×300 mm\nLoad: ~${280+d.xi*12+d.zi*8} kN\nReinf: 4-12Φ bars\nM25 concrete`;
+      document.getElementById('colInfoBox').classList.add('show');
+    }
+  }
+
+  function setManual(msg){
+    autoRotate=false;
+    document.getElementById('rotOnBtn').classList.remove('active-rb');
+    document.getElementById('rotOffBtn').classList.add('active-rb');
+    document.getElementById('viewInfo').textContent=msg||'Manual orbit';
+  }
+
+  canvas.addEventListener('mousedown',e=>{clickMoved=false;lastX=e.clientX;lastY=e.clientY;});
+  canvas.addEventListener('mousemove',e=>{
+    if(e.buttons!==1)return;
+    const dx=e.clientX-lastX,dy=e.clientY-lastY;
+    if(Math.abs(dx)>2||Math.abs(dy)>2){
+      clickMoved=true;setManual();
+      theta-=dx*.007;phi=Math.max(-Math.PI/2+.05,Math.min(Math.PI/2-.05,phi+dy*.007));
+      lastX=e.clientX;lastY=e.clientY;updateCam();
+    }
+  });
+  canvas.addEventListener('click',e=>{
+    if(clickMoved)return;
+    const rect=canvas.getBoundingClientRect();
+    mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    const hits=raycaster.intersectObjects(colMeshes);
+    if(hits.length>0){setManual('Column selected');highlight(hits[0].object);}
+  });
+  canvas.addEventListener('wheel',e=>{e.preventDefault();radius=Math.max(8,Math.min(70,radius+e.deltaY*.05));updateCam();},{passive:false});
+
+  const mL={h360:'Horizontal 360°',v360:'Vertical 360°',both:'Combined Orbit'};
+  window.setAutoRot=v=>{autoRotate=v;modeTime=0;document.getElementById('rotOnBtn').classList.toggle('active-rb',v);document.getElementById('rotOffBtn').classList.toggle('active-rb',!v);document.getElementById('viewInfo').textContent=v?`Auto-rotating · ${mL[rotMode]}`:'Manual mode';};
+  window.setMode=(mode,btn)=>{rotMode=mode;modeTime=0;document.querySelectorAll('#modeBtns .fl-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(autoRotate)document.getElementById('viewInfo').textContent=`Auto-rotating · ${mL[mode]}`;};
+  window.nudge=(axis,dir)=>{setManual();if(axis==='h')theta+=dir*.22;if(axis==='v')phi=Math.max(-Math.PI/2+.05,Math.min(Math.PI/2-.05,phi+dir*.22));updateCam();};
+  window.resetView=()=>{theta=Math.PI/5;phi=0.72;radius=34;autoRotate=true;rotMode='h360';modeTime=0;document.getElementById('rotOnBtn').classList.add('active-rb');document.getElementById('rotOffBtn').classList.remove('active-rb');document.getElementById('viewInfo').textContent='Auto-rotating · Horizontal 360°';document.querySelectorAll('#modeBtns .fl-btn').forEach((b,i)=>b.classList.toggle('active',i===0));updateCam();};
+  window.setFloor=(floor,btn)=>{
+    if(btn) {
+        document.querySelectorAll('.fl-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    colMeshes.forEach(m=>m.visible=floor==='all'||m.userData.floor===floor);
+    const bpf=currentCXS.length*(currentCZS.length-1)+currentCZS.length*(currentCXS.length-1);
+    groups.beams.children.forEach((m,i)=>{const f=Math.floor(i/bpf);m.visible=floor==='all'||f===floor;});
+    groups.slabs.children.forEach((m,i)=>{if(i===0){m.visible=true;return;}m.visible=floor==='all'||(i-1)===floor;});
+    groups.walls.children.forEach((m,i)=>{const f=Math.floor(i/4);m.visible=floor==='all'||f===floor;});
+  };
+  window.toggleEl=(key,btn)=>{const on=btn.classList.contains('on');btn.classList.toggle('on',!on);btn.classList.toggle('off',on);groups[key].visible=!on;};
+  // ═══ API INTEGRATION ═══
+
+  window.regenerate = async () => {
+    const btn = document.querySelector('.gen-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '⚙ Analyzing...';
+    btn.disabled = true;
+
+    const params = {
+      plot_length: parseFloat(document.getElementById('plot_length').value),
+      plot_width: parseFloat(document.getElementById('plot_width').value),
+      floors: document.getElementById('floors').value,
+      bhk: document.getElementById('bhk').value,
+      style: document.getElementById('style').value,
+      max_beam_span: parseFloat(document.getElementById('max_beam_span').value),
+      column_spacing: parseFloat(document.getElementById('column_spacing').value),
+      allowable_deflection: parseFloat(document.getElementById('allowable_deflection').value),
+      concrete_grade: document.getElementById('concrete_grade').value,
+      steel_grade: document.getElementById('steel_grade').value,
+      budget_lakhs: parseFloat(document.getElementById('budget_lakhs').value),
+      seismic_zone: document.getElementById('seismic_zone').value
+    };
+
+    try {
+      const response = await fetch('/api/v1/design/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+
+      if (!response.ok) {
+          const errData = await response.json().catch(() => ({detail: 'Server Error'}));
+          throw new Error(errData.detail || 'API Error');
+      }
+
+      const data = await response.json();
+      currentProjectId = data.project_id;
+      updateUI(data);
+      
+      // Scroll to visual results
+      const vr = document.querySelector('.visual-results');
+      if (vr) vr.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      btn.textContent = '✓ Success!';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      btn.textContent = '⚠ ' + (error.message.length < 15 ? error.message : 'Error');
+      btn.style.background = 'var(--rust)';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 3000);
+    }
+  };
+
+  window.exportFile = async (format, btn) => {
+    if (!currentProjectId) {
+      alert('Please generate a design first.');
+      return;
+    }
+
+    const originalContent = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⚙ Processing...';
+
+    try {
+      const response = await fetch(`/api/v1/export/${format}/${currentProjectId}`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) throw new Error('Export failed');
+
+      // Check content type to see if it's binary or JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          if (data.download_url) {
+            window.location.href = data.download_url;
+          }
+      } else {
+          // Direct blob download
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          // Extract filename from header if possible
+          const disposition = response.headers.get('content-disposition');
+          let filename = `structai_export_${currentProjectId}.${format}`;
+          if (disposition && disposition.indexOf('attachment') !== -1) {
+              const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+              const matches = filenameRegex.exec(disposition);
+              if (matches != null && matches[1]) { 
+                filename = matches[1].replace(/[ '"]/g, '');
+              }
+          }
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+      }
+
+      btn.innerHTML = '✓ Done';
+      setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+      }, 2000);
+    } catch (error) {
+      console.error('Export error:', error);
+      btn.innerHTML = '⚠ Failed';
+      setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+      }, 2000);
+    }
+  };
+
+  function updateUI(data) {
+    if (!data || !data.structural || !data.materials || !data.comparison) return;
+
+    // 1. Update Metrics
+    const metrics = document.querySelectorAll('.metric-card .m-value');
+    if (metrics.length >= 4) {
+        if (metrics[0].childNodes[0]) metrics[0].childNodes[0].textContent = data.structural.safety_score;
+        if (metrics[1].childNodes[0]) metrics[1].childNodes[0].textContent = data.structural.columns.x_positions.length * data.structural.columns.z_positions.length;
+        if (metrics[2].childNodes[0]) metrics[2].childNodes[0].textContent = '₹' + data.materials.cost_breakdown.total.toFixed(1);
+        if (metrics[3].childNodes[0]) metrics[3].childNodes[0].textContent = data.comparison.material_saved_pct.toFixed(0);
+    }
+
+    // 2. Update Comparison Labels
+    const costSub = document.querySelector('.mc-cost .m-sub');
+    if (costSub) costSub.textContent = `Within ₹${data.materials.cost_breakdown.budget}L budget`;
+    
+    const costBadge = document.querySelector('.mc-cost .badge');
+    if (costBadge) costBadge.textContent = `₹${data.materials.cost_breakdown.saved.toFixed(1)}L saved`;
+
+    // 3. Update Structural Table
+    const tableRows = document.querySelectorAll('.s-table tbody tr');
+    if (tableRows.length >= 5) {
+        const setCellText = (rowIdx, text) => {
+            const div = tableRows[rowIdx].querySelector('td:nth-child(2) div');
+            if (div) div.textContent = text;
+        };
+        setCellText(0, data.structural.max_beam_span_m.toFixed(1) + ' m');
+        setCellText(1, data.structural.actual_deflection_mm.toFixed(0) + ' mm');
+        setCellText(2, data.structural.column_load_kn.toFixed(0) + ' kN');
+        setCellText(3, data.structural.slab.thickness_mm + ' mm');
+        setCellText(4, data.structural.shear_capacity_kn.toFixed(0) + ' kN');
+    }
+
+    // 4. Update Charts
+    if (charts.comp) {
+        charts.comp.data.datasets[0].data = [
+          data.comparison.before_cost_lakhs,
+          data.comparison.before_columns,
+          data.comparison.before_beam_spans,
+          data.comparison.before_safety
+        ];
+        charts.comp.data.datasets[1].data = [
+          data.comparison.after_cost_lakhs,
+          data.comparison.after_columns,
+          data.comparison.after_beam_spans,
+          data.comparison.after_safety
+        ];
+        charts.comp.update();
+    }
+
+    if (charts.mat) {
+        charts.mat.data.labels = data.materials.per_floor.map(f => f.floor_label);
+        charts.mat.data.datasets[0].data = data.materials.per_floor.map(f => f.concrete_m3);
+        charts.mat.data.datasets[1].data = data.materials.per_floor.map(f => f.steel_quintals);
+        charts.mat.update();
+    }
+
+    // 5. Update 3D Model
+     if (window.rebuildStructural) {
+         window.rebuildStructural(data.floor_plans.length, data.structural.columns.x_positions, data.structural.columns.z_positions);
+     }
+
+     // 6. Update 2D Floor Plan
+     const floorPlanContainer = document.querySelector('.floor-plan');
+     if (floorPlanContainer && data.floor_plans.length > 0) {
+         const firstFloor = data.floor_plans[0];
+         floorPlanContainer.innerHTML = ''; // Clear existing
+         
+         // Set floor plan container grid to match room layout if possible, 
+         // but for now we keep the flex/grid room display
+         firstFloor.rooms.forEach(room => {
+             const roomDiv = document.createElement('div');
+             roomDiv.className = `room room-${room.name.toLowerCase().replace(/ /g, '')}`;
+             roomDiv.innerHTML = `
+                 <div class="room-name">${room.name}</div>
+                 <div class="room-size">${room.width_m.toFixed(1)} × ${room.depth_m.toFixed(1)} m</div>
+             `;
+             
+             // Add column dots at logical grid points relative to room positions
+             // This is a visual approximation for the 2D dashboard preview
+             roomDiv.innerHTML += '<div class="col-dot ctlp"></div><div class="col-dot ctrp"></div>';
+             roomDiv.innerHTML += '<div class="col-dot cblp"></div><div class="col-dot cbrp"></div>';
+             
+             floorPlanContainer.appendChild(roomDiv);
+         });
+     }
+   }
+
+  window.applyInteriorDesign = async () => {
+    const btn = document.querySelector('.apply-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '⚙ Generating...';
+    btn.disabled = true;
+
+    const hexToRgb = hex => '#' + hex.toString(16).padStart(6, '0');
+
+    const params = {
+      room: currentRoom,
+      style: currentStyle,
+      wall_color: hexToRgb(intColors.wall),
+      floor_color: hexToRgb(intColors.floor),
+      ceiling_color: hexToRgb(intColors.ceiling),
+      furnishings: Array.from(document.querySelectorAll('.furn-item.active .furn-name')).map(el => el.textContent.toLowerCase()),
+      project_id: currentProjectId
+    };
+
+    try {
+      const response = await fetch('/api/v1/interior/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+
+      if (!response.ok) throw new Error('API Error');
+
+      const data = await response.json();
+      if (window.buildRoom) window.buildRoom(); 
+
+      btn.textContent = '✓ Design Applied!';
+      btn.style.background = '#4A7C59';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      btn.textContent = '⚠ Error';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 2000);
+    }
+  };
+
+  function resize2(){const w=canvas.clientWidth,h=canvas.clientHeight;if(renderer.domElement.width!==w||renderer.domElement.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
+
+  let t2=0;
+  function animate(){
+    requestAnimationFrame(animate);resize2();
+    if(autoRotate){modeTime+=.016;if(rotMode==='h360')theta+=.006;else if(rotMode==='v360')phi=(Math.PI/2-.06)*Math.sin(modeTime*.4);else{theta+=.005;phi=.45*Math.sin(modeTime*.35);}updateCam();}
+    colMeshes.forEach(m=>{if(m===selCol)return;m.material.emissive=new THREE.Color(0x1a2d3a);m.material.emissiveIntensity=.1+.08*Math.sin(t2*2.5+m.userData.xi*1.1+m.userData.zi*.8);});
+    t2+=.016;renderer.render(scene,camera);
+  }animate();
+})();
+
+/* ═══ INTERIOR 3D VIEWER ═══ */
+(function(){
+  const canvas=document.getElementById('intCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x111418);
+
+  const camera=new THREE.PerspectiveCamera(60,1,.1,200);
+  camera.position.set(0,3,8);camera.lookAt(0,1.5,0);
+
+  let theta2=0,phi2=0,radius2=8,lastX2=0,lastY2=0;
+  let autoRot2=true;
+
+  scene.add(new THREE.AmbientLight(0xfff8f0,.6));
+  const dl2=new THREE.DirectionalLight(0xfff0d0,1.2);
+  dl2.position.set(5,8,5);dl2.castShadow=true;scene.add(dl2);
+  const pl=new THREE.PointLight(0xFFD580,1.5,12);
+  pl.position.set(0,3,0);scene.add(pl);
+  const pl2=new THREE.PointLight(0x5B8FA8,.8,10);
+  pl2.position.set(-3,2,-2);scene.add(pl2);
+
+  // Room geometry
+  let roomGroup=new THREE.Group();scene.add(roomGroup);
+  let furnitureGroup=new THREE.Group();scene.add(furnitureGroup);
+
+  // intColors already declared globally
+
+  function buildRoom(){
+    roomGroup.clear();furnitureGroup.clear();
+
+    const wallM=new THREE.MeshLambertMaterial({color:intColors.wall,side:THREE.BackSide});
+    const floorM=new THREE.MeshLambertMaterial({color:intColors.floor});
+    const ceilM=new THREE.MeshLambertMaterial({color:intColors.ceiling});
+
+    // Room box
+    const room=new THREE.Mesh(new THREE.BoxGeometry(10,4,8),wallM);
+    room.position.set(0,2,0);room.receiveShadow=true;roomGroup.add(room);
+
+    // Floor
+    const floor=new THREE.Mesh(new THREE.PlaneGeometry(10,8),floorM);
+    floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;roomGroup.add(floor);
+
+    // Ceiling
+    const ceil=new THREE.Mesh(new THREE.PlaneGeometry(10,8),ceilM);
+    ceil.rotation.x=Math.PI/2;ceil.position.y=4;roomGroup.add(ceil);
+
+    // Window opening (bright patch)
+    const winLight=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.8),new THREE.MeshBasicMaterial({color:0xD4E8F5,transparent:true,opacity:.7}));
+    winLight.position.set(4.9,2.2,0);winLight.rotation.y=-Math.PI/2;roomGroup.add(winLight);
+
+    // Window frame
+    const wfM=new THREE.MeshLambertMaterial({color:0xE8E3D8});
+    [[-0.04,0],[0.04,0],[0,-0.04],[0,0.04]].forEach(([ox,oz])=>{
+      const wf=new THREE.Mesh(new THREE.BoxGeometry(.05,1.8,.05),wfM);
+      wf.position.set(4.95,2.2,ox||oz);roomGroup.add(wf);
+    });
+
+    buildFurniture();
+  }
+  window.buildRoom = buildRoom;
+
+  function buildFurniture(){
+    const style=currentStyle;
+
+    const colors={
+      modern:{sofa:0x3D5A6C,table:0x2C2A25,accent:0x5B8FA8,wood:0xA0826D},
+      warm:  {sofa:0x8B4513,table:0xC8A26A,accent:0xB5651D,wood:0x8B6914},
+      luxury:{sofa:0x1A1A2E,table:0x1C1C1C,accent:0xD4AF37,wood:0x2C2A25},
+      nature:{sofa:0x4A7C59,table:0xA0826D,accent:0x6B8F71,wood:0xB5854D}
+    };
+    const c=colors[style]||colors.modern;
+
+    // Sofa
+    const sofaM=new THREE.MeshLambertMaterial({color:c.sofa});
+    const sofa=new THREE.Mesh(new THREE.BoxGeometry(3,.7,1),sofaM);
+    sofa.position.set(-1.5,.35,-2.5);sofa.castShadow=true;furnitureGroup.add(sofa);
+    const sofaBack=new THREE.Mesh(new THREE.BoxGeometry(3,.8,.2),sofaM);
+    sofaBack.position.set(-1.5,.7+.4,-2.9);furnitureGroup.add(sofaBack);
+    // sofa legs
+    [[-.1,0],[-.1,0],[.1,0],[.1,0]].forEach((_,i)=>{
+      const leg=new THREE.Mesh(new THREE.BoxGeometry(.08,.35,.08),new THREE.MeshLambertMaterial({color:c.wood}));
+      leg.position.set(-2.9+i*.8,.17,-2.1+((i%2)*-.8));furnitureGroup.add(leg);
+    });
+
+    // Coffee table
+    const tableM=new THREE.MeshLambertMaterial({color:c.table});
+    const table=new THREE.Mesh(new THREE.BoxGeometry(1.2,.08,.8),tableM);
+    table.position.set(-1.5,.5,-.8);furnitureGroup.add(table);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([tx,tz])=>{
+      const leg=new THREE.Mesh(new THREE.BoxGeometry(.06,.42,.06),tableM);
+      leg.position.set(-1.5+tx*.55,.21,-.8+tz*.35);furnitureGroup.add(leg);
+    });
+
+    // TV unit
+    const tvUnit=new THREE.Mesh(new THREE.BoxGeometry(3,.5,.45),new THREE.MeshLambertMaterial({color:c.wood}));
+    tvUnit.position.set(-1.5,.25,3.5);furnitureGroup.add(tvUnit);
+    const tv=new THREE.Mesh(new THREE.BoxGeometry(2,.1,1.2),new THREE.MeshLambertMaterial({color:0x111111}));
+    tv.rotation.x=Math.PI/2;tv.position.set(-1.5,1.4,3.7);furnitureGroup.add(tv);
+    const tvScreen=new THREE.Mesh(new THREE.PlaneGeometry(1.9,1.1),new THREE.MeshBasicMaterial({color:0x1a3a5c,transparent:true,opacity:.9}));
+    tvScreen.position.set(-1.5,1.4,3.65);furnitureGroup.add(tvScreen);
+
+    // Plant
+    const potM=new THREE.MeshLambertMaterial({color:c.accent});
+    const pot=new THREE.Mesh(new THREE.CylinderGeometry(.2,.15,.4,8),potM);
+    pot.position.set(3.5,.2,-2.5);furnitureGroup.add(pot);
+    const plant=new THREE.Mesh(new THREE.SphereGeometry(.5,8,6),new THREE.MeshLambertMaterial({color:0x2D6A4F}));
+    plant.position.set(3.5,.9,-2.5);furnitureGroup.add(plant);
+    const plant2=new THREE.Mesh(new THREE.SphereGeometry(.35,8,6),new THREE.MeshLambertMaterial({color:0x40916C}));
+    plant2.position.set(3.7,1.1,-2.3);furnitureGroup.add(plant2);
+
+    // Pendant light
+    const pendantM=new THREE.MeshLambertMaterial({color:c.accent,emissive:new THREE.Color(c.accent),emissiveIntensity:.3});
+    const pendant=new THREE.Mesh(new THREE.CylinderGeometry(.25,.35,.3,8),pendantM);
+    pendant.position.set(0,3.6,0);furnitureGroup.add(pendant);
+    const cord=new THREE.Mesh(new THREE.CylinderGeometry(.01,.01,.6,4),new THREE.MeshLambertMaterial({color:0x2C2A25}));
+    cord.position.set(0,3.9,0);furnitureGroup.add(cord);
+
+    // Rug
+    const rug=new THREE.Mesh(new THREE.PlaneGeometry(4,3),new THREE.MeshLambertMaterial({color:c.accent,transparent:true,opacity:.6}));
+    rug.rotation.x=-Math.PI/2;rug.position.set(-1.5,.01,-.5);furnitureGroup.add(rug);
+
+    // Side chairs
+    const chair1=new THREE.Mesh(new THREE.BoxGeometry(.6,.5,.6),new THREE.MeshLambertMaterial({color:c.sofa}));
+    chair1.position.set(1.2,.25,-.5);furnitureGroup.add(chair1);
+    const chair1Back=new THREE.Mesh(new THREE.BoxGeometry(.6,.6,.08),new THREE.MeshLambertMaterial({color:c.sofa}));
+    chair1Back.position.set(1.2,.65,-.76);furnitureGroup.add(chair1Back);
+
+    const chair2=chair1.clone();chair2.position.set(1.2,.25,.5);furnitureGroup.add(chair2);
+    const chair2Back=chair1Back.clone();chair2Back.position.set(1.2,.65,.26);furnitureGroup.add(chair2Back);
+  }
+
+   
+  window.selectRoom=(room,btn)=>{
+    currentRoom=room;
+    document.querySelectorAll('.room-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const labels={living:'Living / Dining Room',bedroom1:'Bedroom 1',bedroom2:'Bedroom 2',kitchen:'Kitchen',bathroom:'Bathroom',exterior:'Building Exterior'};
+    document.getElementById('roomLabel').textContent=labels[room]||room;
+    buildRoom();
+  };
+  window.selectStyle=(style,el)=>{
+    currentStyle=style;
+    document.querySelectorAll('.style-opt').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+    const labels={modern:'Modern Minimal',warm:'Warm Traditional',luxury:'Luxury Contemporary',nature:'Biophilic Natural'};
+    document.getElementById('styleBadge').textContent=labels[style]||style;
+    buildRoom();
+  };
+  window.setColor=(type,hex,el)=>{
+    el.closest('.palette-colors').querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+    intColors[type]=parseInt(hex.replace('#','0x'));
+    buildRoom();
+  };
+  const var_lime='#4A7C59';
+
+  buildRoom();
+
+  // orbit
+  canvas.addEventListener('mousedown',e=>{lastX2=e.clientX;lastY2=e.clientY;autoRot2=false;});
+  canvas.addEventListener('mousemove',e=>{
+    if(e.buttons!==1)return;
+    const dx=e.clientX-lastX2,dy=e.clientY-lastY2;
+    theta2-=dx*.008;phi2=Math.max(-Math.PI/2+.1,Math.min(Math.PI/2-.1,phi2+dy*.008));
+    lastX2=e.clientX;lastY2=e.clientY;updateIntCam();
+  });
+  canvas.addEventListener('wheel',e=>{e.preventDefault();radius2=Math.max(3,Math.min(15,radius2+e.deltaY*.03));updateIntCam();},{passive:false});
+
+  function updateIntCam(){
+    camera.position.set(
+      Math.sin(theta2)*Math.cos(phi2)*radius2,
+      Math.sin(phi2)*radius2+1.5,
+      Math.cos(theta2)*Math.cos(phi2)*radius2
+    );camera.lookAt(0,1.5,0);
+  }
+
+  function resizeInt(){
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    if(!h)return;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+
+  let t3=0;
+  function animateInt(){
+    requestAnimationFrame(animateInt);resizeInt();
+    if(autoRot2){theta2+=.004;updateIntCam();}
+    pl.intensity=1.3+.3*Math.sin(t3*1.5);
+    t3+=.016;
+    renderer.render(scene,camera);
+  }animateInt();
+})();
+
+/* ═══ FINAL OUTPUT 3D (full building) ═══ */
+(function(){
+  const canvas=document.getElementById('finalCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0D1219);
+
+  const camera=new THREE.PerspectiveCamera(40,1,.1,300);
+  let theta3=Math.PI/6,phi3=.5,radius3=38;
+  const target3=new THREE.Vector3(6,5,4.5);
+
+  function updateCam3(){
+    camera.position.set(target3.x+radius3*Math.sin(theta3)*Math.cos(phi3),target3.y+radius3*Math.sin(phi3),target3.z+radius3*Math.cos(theta3)*Math.cos(phi3));
+    camera.lookAt(target3);
+  }updateCam3();
+
+  scene.add(new THREE.AmbientLight(0x6080a0,.5));
+  const dl3=new THREE.DirectionalLight(0xffd080,1.3);dl3.position.set(15,25,10);dl3.castShadow=true;scene.add(dl3);
+  const dl4=new THREE.DirectionalLight(0x8080ff,.3);dl4.position.set(-10,5,-8);scene.add(dl4);
+
+  // Ground plane
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshLambertMaterial({color:0x1A2030}));
+  ground.rotation.x=-Math.PI/2;ground.position.y=-.02;scene.add(ground);
+
+  // Grid
+  const grid2=new THREE.GridHelper(40,40,0x1A2535,0x151D2A);
+  grid2.position.set(6,.01,4.5);scene.add(grid2);
+
+  const FLOORS=3,FH=3.2;
+  const cxs=[0,4,8,12],czs=[0,3,6,9];
+
+  // Full building with exterior walls
+  const extWallM=new THREE.MeshLambertMaterial({color:0xD4C9B8});
+  const windowM=new THREE.MeshLambertMaterial({color:0x8ABCDC,transparent:true,opacity:.7});
+  const colM=new THREE.MeshLambertMaterial({color:0x4A6878});
+  const beamM=new THREE.MeshLambertMaterial({color:0x8B6E4E});
+  const slabM=new THREE.MeshLambertMaterial({color:0x9AAFA5,transparent:true,opacity:.85});
+  const roofM=new THREE.MeshLambertMaterial({color:0x5A4A3A});
+
+  function bx3(w,h,d,mat,x,y,z){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+    m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
+  }
+
+  for(let f=0;f<FLOORS;f++){
+    const by=f*FH;
+
+    // Columns
+    for(let xi=0;xi<cxs.length;xi++)
+      for(let zi=0;zi<czs.length;zi++)
+        bx3(.45,FH,.45,colM,cxs[xi],by+FH/2,czs[zi]);
+
+    // Beams
+    for(let xi=0;xi<cxs.length;xi++)
+      for(let zi=0;zi<czs.length-1;zi++){
+        const span=czs[zi+1]-czs[zi];
+        bx3(.3,.45,span,beamM,cxs[xi],by+FH-.225,(czs[zi]+czs[zi+1])/2);
+      }
+    for(let zi=0;zi<czs.length;zi++)
+      for(let xi=0;xi<cxs.length-1;xi++){
+        const span=cxs[xi+1]-cxs[xi];
+        bx3(span,.45,.3,beamM,(cxs[xi]+cxs[xi+1])/2,by+FH-.225,czs[zi]);
+      }
+
+    // Slab
+    bx3(12,.15,9,slabM,6,by+FH,4.5);
+
+    // Exterior walls with windows
+    // Front wall
+    bx3(12,.6,.2,extWallM,6,by+.3,0);
+    bx3(12,(FH*.4),.2,extWallM,6,by+FH*.8,0);
+    // Windows front
+    [2,6,10].forEach(wx=>{bx3(1.8,1.5,.22,windowM,wx,by+FH*.45,-.01);});
+
+    // Back wall
+    bx3(12,.6,.2,extWallM,6,by+.3,9);
+    bx3(12,(FH*.4),.2,extWallM,6,by+FH*.8,9);
+    [2,6,10].forEach(wx=>{bx3(1.8,1.5,.22,windowM,wx,by+FH*.45,9.01);});
+
+    // Side walls
+    bx3(.2,FH*.5,9,extWallM,0,by+FH*.25,4.5);
+    bx3(.2,FH*.5,9,extWallM,12,by+FH*.25,4.5);
+  }
+
+  // Ground floor base
+  bx3(12.4,.3,9.4,new THREE.MeshLambertMaterial({color:0x2A3040}),6,-.15,4.5);
+
+  // Roof (slight overhang)
+  bx3(13.5,.3,10.5,roofM,6,FLOORS*FH+.15,4.5);
+  // Parapet
+  [[6,FLOORS*FH+.45,-0.5],[6,FLOORS*FH+.45,9.5],[-.75,FLOORS*FH+.45,4.5],[12.75,FLOORS*FH+.45,4.5]]
+  .forEach(([x,y,z],i)=>{
+    const w=i<2?13.5:.3,d=i<2?.3:10.5;
+    bx3(w,.6,d,roofM,x,y,z);
+  });
+
+  // Solar panels on roof
+  for(let r=0;r<2;r++)for(let c2=0;c2<3;c2++){
+    bx3(2.5,.05,1.5,new THREE.MeshLambertMaterial({color:0x1a3a5c}),2+c2*3.5,FLOORS*FH+.45,1+r*2.5);
+  }
+
+  // Water tank
+  bx3(2,.8,2,new THREE.MeshLambertMaterial({color:0x3A4A5A}),10.5,FLOORS*FH+.7,7);
+
+  // Entrance canopy
+  bx3(3,.12,2,new THREE.MeshLambertMaterial({color:0x4A3828,transparent:true,opacity:.8}),6,FH*.4,-.5);
+  bx3(.1,FH*.4,.1,colM,4.8,.2*FH,-1.2);
+  bx3(.1,FH*.4,.1,colM,7.2,.2*FH,-1.2);
+
+  // Door
+  bx3(1,2.2,.22,new THREE.MeshLambertMaterial({color:0x3D2B1A}),6,1.1,-.01);
+
+  // Garden/Surroundings
+  const grass=new THREE.Mesh(new THREE.PlaneGeometry(6,6),new THREE.MeshLambertMaterial({color:0x2D5016}));
+  grass.rotation.x=-Math.PI/2;grass.position.set(6,.01,-3);scene.add(grass);
+
+  // Trees
+  [[3,-3],[8,-4],[12.5,2],[12.5,7]].forEach(([tx,tz])=>{
+    const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.2,.25,2,6),new THREE.MeshLambertMaterial({color:0x4A3020}));
+    trunk.position.set(tx,1,tz);scene.add(trunk);
+    const foliage=new THREE.Mesh(new THREE.SphereGeometry(1.2,7,6),new THREE.MeshLambertMaterial({color:0x2D7A3A}));
+    foliage.position.set(tx,3,tz);scene.add(foliage);
+  });
+
+  // Driveway
+  const drive=new THREE.Mesh(new THREE.PlaneGeometry(3,5),new THREE.MeshLambertMaterial({color:0x252B35}));
+  drive.rotation.x=-Math.PI/2;drive.position.set(6,.01,-2);scene.add(drive);
+
+  // Boundary wall
+  [[6,-.15,-5],[6,-.15,9.8],[-1,.55,2.5],[-1,.55,6.5]].forEach(([x,y,z],i)=>{
+    const w=i<2?16:.25,d=i<2?.25:4;
+    const bwall=new THREE.Mesh(new THREE.BoxGeometry(w,.9,d),new THREE.MeshLambertMaterial({color:0xB8A898}));
+    bwall.position.set(x,y,z);scene.add(bwall);
+  });
+
+  // Interactive orbit
+  let lastX3=0,lastY3=0;
+  canvas.addEventListener('mousedown',e=>{lastX3=e.clientX;lastY3=e.clientY;});
+  canvas.addEventListener('mousemove',e=>{
+    if(e.buttons!==1)return;
+    const dx=e.clientX-lastX3,dy=e.clientY-lastY3;
+    theta3-=dx*.007;phi3=Math.max(.05,Math.min(Math.PI/2-.05,phi3+dy*.007));
+    lastX3=e.clientX;lastY3=e.clientY;updateCam3();
+  });
+  canvas.addEventListener('wheel',e=>{e.preventDefault();radius3=Math.max(15,Math.min(80,radius3+e.deltaY*.05));updateCam3();},{passive:false});
+
+  // Fog for atmosphere
+  scene.fog=new THREE.Fog(0x0D1219,40,120);
+
+  function resize3(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+
+  let t4=0;
+  function animate3(){
+    requestAnimationFrame(animate3);resize3();
+    theta3+=.003;updateCam3();
+    dl3.intensity=1.2+.15*Math.sin(t4*.5);
+    t4+=.016;
+    renderer.render(scene,camera);
+  }animate3();
+})();
+</script>
+</body>
+</html>
