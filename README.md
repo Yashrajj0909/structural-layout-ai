@@ -3,18 +3,20 @@
 **An AI-powered structural engineering and architectural design suite.**  
 FastAPI · Python 3.11+ · SQLite · IS 456 / IS 875 / NBC 2016
 
+[![Deployment Status](https://img.shields.io/badge/Deployment-Live-success)](https://structai-designer.onrender.com/)
+
 ---
 
 ## 🚀 Quick Access Links
 
-| Feature | Local URL | Description |
-| :--- | :--- | :--- |
-| **Main Dashboard** | [http://localhost:8000/](http://localhost:8000/) | Structural analysis & cost optimization dashboard |
-| **2D Floor Plan** | [http://localhost:8000/floorplan](http://localhost:8000/floorplan) | Interactive 2D layout with drag-and-drop & road context |
-| **Column Grid Model** | [http://localhost:8000/column-grid](http://localhost:8000/column-grid) | Dynamic 3D column grid with customizable shapes & sizes |
-| **Soil Analysis** | [http://localhost:8000/soil](http://localhost:8000/soil) | Soil bearing capacity & FSI calculation tools |
-| **API Documentation** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive Swagger UI for all API endpoints |
-| **ReDoc** | [http://localhost:8000/redoc](http://localhost:8000/redoc) | Alternative API documentation view |
+| Feature | Deployment URL | Local URL | Description |
+| :--- | :--- | :--- | :--- |
+| **Main Dashboard** | [https://structai-designer.onrender.com/](https://structai-designer.onrender.com/) | [http://localhost:8000/](http://localhost:8000/) | Structural analysis & cost optimization dashboard |
+| **2D Floor Plan** | [https://structai-designer.onrender.com/floorplan](https://structai-designer.onrender.com/floorplan) | [http://localhost:8000/floorplan](http://localhost:8000/floorplan) | Interactive 2D layout with drag-and-drop & road context |
+| **Column Grid Model** | [https://structai-designer.onrender.com/column-grid](https://structai-designer.onrender.com/column-grid) | [http://localhost:8000/column-grid](http://localhost:8000/column-grid) | Dynamic 3D column grid with customizable shapes & sizes |
+| **Soil Analysis** | [https://structai-designer.onrender.com/soil](https://structai-designer.onrender.com/soil) | [http://localhost:8000/soil](http://localhost:8000/soil) | Soil bearing capacity & FSI calculation tools |
+| **API Documentation** | [https://structai-designer.onrender.com/docs](https://structai-designer.onrender.com/docs) | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive Swagger UI for all API endpoints |
+| **ReDoc** | [https://structai-designer.onrender.com/redoc](https://structai-designer.onrender.com/redoc) | [http://localhost:8000/redoc](http://localhost:8000/redoc) | Alternative API documentation view |
 
 ---
 
